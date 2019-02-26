@@ -66,7 +66,6 @@ public class ArticleController {
     }
 
     //Single item
-
     //@PathVariable - take the id from the URL
     @GetMapping("/articles/{id}")
     public Resource<Article> one(@PathVariable Long articleId) {
