@@ -50,4 +50,6 @@ public class Article {
         this.comments = Stream.of(comments).collect(Collectors.toSet());
         this.comments.forEach(c -> c.setArticle(this));
     }
+
+    public void saveByCategoryId
 }

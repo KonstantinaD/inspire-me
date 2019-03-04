@@ -3,6 +3,7 @@ package com.inspireme.presentationlayer;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import com.inspireme.domainlayer.Article;
+import com.inspireme.domainlayer.Category;
 import com.inspireme.presentationlayer.controllers.ArticleController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
@@ -14,14 +15,16 @@ import org.springframework.stereotype.Component;
  * What is the point of adding all these links? It makes it possible to evolve REST services over time. Existing links can be maintained while new links are added in the future. Newer clients may take advantage of the new links, while legacy clients can sustain themselves on the old links. This is especially helpful if services get relocated and moved around. As long as the link structure is maintained, clients can STILL find and interact with things.
  */
 @Component  ////this component will be automatically created when the application starts
-public class ArticleResourceAssembler implements ResourceAssembler<Article, Resource<Article>>{
-    @Override
-    public Resource<Article> toResource(Article article) {
+public class ArticleResourceAssembler  {/*implements ResourceAssembler<Article, Resource<Article>>{
+    @Override*/
+    public Resource<Article> toResource(Article article, Category category) {
      /*linkTo(methodOn(ArticleController.class).one(id)).withSelfRel() asks that Spring HATEOAS build a link to the ArticleController's one() method, and flag it as a self link.
         linkTo(methodOn(ArticleController.class).all()).withRel("articles") asks Spring HATEOAS to build a link to the aggregate root, all(), and call it "articles".*/
+        Long catId = category.getCategoryId();
 
         return new Resource<>(article,
                 linkTo(methodOn(ArticleController.class).one(article.getArticleId())).withSelfRel(),
+                linkTo(methodOn(ArticleController.class).allByCategoryId(catId)).withRel("articles" + "/" + "catId"),
                 linkTo(methodOn(ArticleController.class).all()).withRel("articles"));
     }
 }
