@@ -17,11 +17,15 @@ import org.springframework.stereotype.Component;
 public class ArticleResourceAssembler implements ResourceAssembler<Article, Resource<Article>>{
     @Override
     public Resource<Article> toResource(Article article) {
-     /*linkTo(methodOn(ArticleController.class).one(id)).withSelfRel() asks that Spring HATEOAS build a link to the ArticleController's one() method, and flag it as a self link.
-        linkTo(methodOn(ArticleController.class).all()).withRel("articles") asks Spring HATEOAS to build a link to the aggregate root, all(), and call it "articles".*/
-
-        return new Resource<>(article,
-                linkTo(methodOn(ArticleController.class).one(article.getArticleId())).withSelfRel(),
-                linkTo(methodOn(ArticleController.class).all()).withRel("articles"));
+        return null;
     }
+//    @Override
+//    public Resource<Article> toResource(Article article) {
+//     /*linkTo(methodOn(ArticleController.class).one(id)).withSelfRel() asks that Spring HATEOAS build a link to the ArticleController's one() method, and flag it as a self link.
+//        linkTo(methodOn(ArticleController.class).all()).withRel("articles") asks Spring HATEOAS to build a link to the aggregate root, all(), and call it "articles".*/
+//
+//        return new Resource<>(article,
+//                linkTo(methodOn(ArticleController.class).one(article.getArticleId())).withSelfRel(),
+//                linkTo(methodOn(ArticleController.class).all()).withRel("articles"));
+//    }
 }

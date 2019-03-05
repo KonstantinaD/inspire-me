@@ -1,5 +1,6 @@
 package com.inspireme.domainlayer;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,7 @@ public class Article {
 
     @ManyToOne //many Articles (this class) in 1 Category(this annotated column)
     @JoinColumn //The corresponding table to this annotated column - Category - has a column - categoryId - with a foreign key to the referenced table (of this class) - Article
+    @JsonManagedReference
     private Category category;
 
     @ManyToOne //many Articles (this class) by 1 User(this annotated column)
