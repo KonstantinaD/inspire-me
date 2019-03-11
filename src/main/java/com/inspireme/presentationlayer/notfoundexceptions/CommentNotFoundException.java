@@ -1,4 +1,4 @@
-package com.inspireme.presentationlayer;
+package com.inspireme.presentationlayer.notfoundexceptions;
 
 public class CommentNotFoundException extends RuntimeException {
     public CommentNotFoundException(Long commentId) {

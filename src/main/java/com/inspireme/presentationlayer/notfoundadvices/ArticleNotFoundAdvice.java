@@ -1,7 +1,8 @@
-package com.inspireme.presentationlayer;
+package com.inspireme.presentationlayer.notfoundadvices;
 
 /*When an ArticleNotFoundException is thrown, this part of Spring MVC configuration is used to render an HTTP 404*/
 
+import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

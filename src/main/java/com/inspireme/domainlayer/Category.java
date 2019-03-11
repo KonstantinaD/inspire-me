@@ -25,7 +25,7 @@ public class Category {
     private String categoryName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonBackReference  //On the Article objects, of which this sets consist, there is a @JsonManagedReference annotation for the Category field(this class) - don't serialise (include) in the Category (this class) object any information about the included Articles (otherwise there is infinite loop - stack overflow)
     private Set<Article> articles;
 
     public Category (String categoryName, Article... articles) {

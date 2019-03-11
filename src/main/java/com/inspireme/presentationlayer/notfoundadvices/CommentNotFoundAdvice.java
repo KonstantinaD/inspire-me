@@ -1,5 +1,6 @@
-package com.inspireme.presentationlayer;
+package com.inspireme.presentationlayer.notfoundadvices;
 
+import com.inspireme.presentationlayer.notfoundexceptions.CommentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

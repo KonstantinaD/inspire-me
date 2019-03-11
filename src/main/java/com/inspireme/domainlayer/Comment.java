@@ -1,5 +1,6 @@
 package com.inspireme.domainlayer;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Comment {
 
     @ManyToOne //many-to-one relationship between the 2 entities - Comment and Article - many Comments (this class) for 1 Article (this annotated column)
     @JoinColumn //(the entity - Comment - is the owner of the relationship and) the corresponding table to this annotated column - Article - has a column - acticleId - with a foreign key to the referenced table (of this class) - Comment
+    @JsonManagedReference
     private Article article;
 
     @ManyToOne //many Comments (this class) by 1 User(this annotated column)

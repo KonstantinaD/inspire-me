@@ -1,4 +1,4 @@
-package com.inspireme.presentationlayer;
+package com.inspireme.presentationlayer.resourceassemblers;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 

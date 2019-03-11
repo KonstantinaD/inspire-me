@@ -1,36 +1,24 @@
 package com.inspireme.presentationlayer.controllers;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.inspireme.domainlayer.Article;
-import com.inspireme.domainlayer.Category;
 import com.inspireme.infrastructurelayer.ArticleRepository;
 import com.inspireme.infrastructurelayer.UserRepository;
-import com.inspireme.presentationlayer.ArticleNotFoundException;
-import com.inspireme.presentationlayer.ArticleResourceAssembler;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import com.inspireme.presentationlayer.resourceassemblers.ArticleResourceAssembler;
+import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /*To wrap your repository with a web layer, you must turn to Spring MVC
 An ArticleRepository is injected by constructor into the controller.
 All the controller methods return one of Spring HATEOAS’s ResourceSupport subclasses to properly render hypermedia (or an wrapper around such a type).
 */
 
-@RestController  //RestController indicates that the data returned by each method will be written straight into the response body instead of rendering a template.
+@RestController  //RestController indicates that the data returned by each method will be written straight into the response body instead of rendering a view template (view model).
 public class ArticleController {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
@@ -59,9 +47,20 @@ public class ArticleController {
 //    }
 
     @GetMapping("/articles")
-    public List<Article> getArticles() {
+    public List<Article> getAllArticles() {
         return articleRepository.findAll();
     }
+
+    @GetMapping("/articles/{articleId}")
+     public Article getArticleById(@PathVariable Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow((() -> new ArticleNotFoundException(articleId)));
+    }
+
+//    @GetMapping("/articles/category/{categoryId}")
+//    public List<Article> getAllArticlesPerCategory(@PathVariable Long categoryId) {
+//        return articleRepository.findByCategory(categoryId);
+//    }
 
 //    //All articles by category id
 //    @GetMapping("/articles/{catId}")
