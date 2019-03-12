@@ -1,11 +1,14 @@
 package com.inspireme.domainlayer;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Data
@@ -18,12 +21,13 @@ public class User {
     private String userName;
 
     private UserType userType;
-    //private Date dateUserCreated;
+
     private LocalDateTime dateUserCreated;
 
-    public User(String userName, UserType userType/*, Date dateUserCreated*/) {
+    @JsonCreator
+    public User(@JsonProperty("userName") String userName, @JsonProperty("userType") UserType userType) {
         this.userName = userName;
         this.userType = userType;
-        this.dateUserCreated = LocalDateTime.now(); //dateUserCreated;
+        this.dateUserCreated = LocalDateTime.now();
     }
 }
