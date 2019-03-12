@@ -1,17 +1,15 @@
 package com.inspireme.presentationlayer.controllers;
 
-import java.util.List;
-
 import com.inspireme.domainlayer.Article;
 import com.inspireme.infrastructurelayer.ArticleRepository;
 import com.inspireme.infrastructurelayer.UserRepository;
-import com.inspireme.presentationlayer.resourceassemblers.ArticleResourceAssembler;
 import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
+import com.inspireme.presentationlayer.resourceassemblers.ArticleResourceAssembler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import java.util.List;
 
 /*To wrap your repository with a web layer, you must turn to Spring MVC
 An ArticleRepository is injected by constructor into the controller.
@@ -57,10 +55,10 @@ public class ArticleController {
                 .orElseThrow((() -> new ArticleNotFoundException(articleId)));
     }
 
-//    @GetMapping("/articles/category/{categoryId}")
-//    public List<Article> getAllArticlesPerCategory(@PathVariable Long categoryId) {
-//        return articleRepository.findByCategory(categoryId);
-//    }
+    @GetMapping("/articles/category/{categoryId}")
+    public List<Article> getAllArticlesPerCategory(@PathVariable Long categoryId) {
+        return articleRepository.findByCategoryId(categoryId);
+    }
 
 //    //All articles by category id
 //    @GetMapping("/articles/{catId}")
