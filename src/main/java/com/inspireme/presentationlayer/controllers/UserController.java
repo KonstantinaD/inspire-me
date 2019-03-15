@@ -3,6 +3,7 @@ package com.inspireme.presentationlayer.controllers;
 import com.inspireme.domainlayer.User;
 import com.inspireme.domainlayer.UserType;
 import com.inspireme.infrastructurelayer.UserRepository;
+import com.inspireme.presentationlayer.assemblers.UserResourceAssembler;
 import com.inspireme.presentationlayer.notfoundexceptions.UserNotFoundException;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -30,18 +31,18 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public Resources<Resource<User>> all() {
+    public Resources<Resource<User>> getAllUsers() {
         List<Resource<User>> users = repository.findAll().stream()
                 .map(assembler::toResource)
                 .collect(Collectors.toList());
 
         return new Resources<>(users,
-                linkTo(methodOn(UserController.class).all()).withSelfRel());
+                linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel()); //SelfRef comes from the Get mapping
 
     }
 
     @GetMapping("/users/{userId}")
-    public Resource<User> one(@PathVariable Long userId) {
+    public Resource<User> getUserById(@PathVariable Long userId) {
 
         User user = repository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -50,13 +51,13 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> newUser(@RequestBody User newUser) throws URISyntaxException {
+    public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
             Resource<User> resource = assembler.toResource(repository.save(newUser));
 
             return ResponseEntity
-                    .created(new URI(resource.getId().expand().getHref()))
+                    .created(new URI(resource.getId().expand().getHref()))  //the italic is the http status
                     .body(resource);
         }
 
@@ -77,7 +78,7 @@ public class UserController {
                             return repository.save(user);
                         })
                         .orElseGet(() -> {
-                            newUser.setUserId(userId);
+                            //newUser.setUserId(userId);
                             return repository.save(newUser);
                         });
 
@@ -95,7 +96,7 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Updating the Admin user not allowed", "You can't update the user with userId " + newUser.getUserId() + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Updating the Admin user not allowed", "You can't update the user with userId " + userId + ". This is the Admin user."));
 
     }
 

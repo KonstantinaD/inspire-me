@@ -1,7 +1,9 @@
 package com.inspireme.domainlayer;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -44,7 +46,8 @@ public class Article {
     private User articlePublishedBy;
 
     //include the set of Comments in the constructor
-    public Article (String articleTitle, String articleText, String imageUrl, /*Date dateArticlePublished,*/ Category category, User articlePublishedBy, Comment... comments) {
+    @JsonCreator  //so that the system date can be used in the controller for the time of article creation
+    public Article (@JsonProperty("articleTitle")String articleTitle, @JsonProperty("articleText")String articleText, @JsonProperty("imageUrl")String imageUrl, @JsonProperty("category")Category category, @JsonProperty("articlePublishedBy")User articlePublishedBy, @JsonProperty("comments")Comment... comments) {
         this.articleTitle = articleTitle;
         this.articleText = articleText;
         this.imageUrl = imageUrl;
