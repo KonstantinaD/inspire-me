@@ -1,10 +1,8 @@
-package com.inspireme.presentationlayer.assemblers;
+package com.inspireme.presentationlayer.controllers;
 
 import com.inspireme.domainlayer.User;
-import com.inspireme.presentationlayer.controllers.UserController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -17,8 +15,8 @@ public class UserResourceAssembler implements ResourceAssembler<User, Resource<U
     public Resource<User> toResource(User user) {
 
         return new Resource<>(user,
-                ControllerLinkBuilder.linkTo(methodOn(UserController.class).getUserById(user.getUserId())).withSelfRel(),
-                linkTo(methodOn(UserController.class).getAllUsers()).withRel("users"));
+                linkTo(methodOn(UserController.class).one(user.getUserId())).withSelfRel(),
+                linkTo(methodOn(UserController.class).all()).withRel("employees"));
     }
 }
 

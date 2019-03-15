@@ -7,7 +7,9 @@ import com.inspireme.infrastructurelayer.ArticleRepository;
 import com.inspireme.infrastructurelayer.UserRepository;
 import com.inspireme.presentationlayer.resourceassemblers.ArticleResourceAssembler;
 import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -54,17 +56,6 @@ public class ArticleController {
         return articleRepository.findById(articleId)
                 .orElseThrow((() -> new ArticleNotFoundException(articleId)));
     }
-
-    @GetMapping("/articles/category/{categoryId}")
-    public List<Article> getAllArticlesByCategoryId(@PathVariable Long categoryId) {
-        return articleRepository.findByCategoryId(categoryId);
-    }
-
-    @PostMapping("/articles/category/{categoryId}")
-    Article createNewArticle(@RequestBody Article newArticle, @PathVariable Long categoryId) {
-        return articleRepository.saveByCategoryId(newArticle, categoryId);
-    }
-
 
 //    @GetMapping("/articles/category/{categoryId}")
 //    public List<Article> getAllArticlesPerCategory(@PathVariable Long categoryId) {
