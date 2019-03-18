@@ -1,20 +1,22 @@
-package com.inspireme.presentationlayer.resourceassemblers;
+package com.inspireme.presentationlayer.controllers;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-import com.inspireme.domainlayer.Comment;
-import com.inspireme.presentationlayer.controllers.CommentController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.stereotype.Component;
+import com.inspireme.domainlayer.Comment;
 
 @Component
-public class CommentResourceAssembler /*implements ResourceAssembler<Comment, Resource<Comment>>*/{
-    /*@Override
+public class CommentResourceAssembler implements ResourceAssembler<Comment, Resource<Comment>> {
+
+    @Override
     public Resource<Comment> toResource(Comment comment) {
 
         return new Resource<>(comment,
                 linkTo(methodOn(CommentController.class).one(comment.getCommentId())).withSelfRel(),
                 linkTo(methodOn(CommentController.class).all()).withRel("comments"));
-        }*/
     }
+}
+

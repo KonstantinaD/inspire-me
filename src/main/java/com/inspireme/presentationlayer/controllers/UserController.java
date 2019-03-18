@@ -101,7 +101,7 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
             repository.deleteById(userId);
