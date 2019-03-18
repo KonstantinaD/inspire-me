@@ -1,14 +1,23 @@
 package com.inspireme.presentationlayer.controllers;
 
 import com.inspireme.domainlayer.Article;
+import com.inspireme.domainlayer.User;
+import com.inspireme.domainlayer.UserType;
 import com.inspireme.infrastructurelayer.ArticleRepository;
 import com.inspireme.infrastructurelayer.UserRepository;
 import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
-import com.inspireme.presentationlayer.resourceassemblers.ArticleResourceAssembler;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.VndErrors;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /*To wrap your repository with a web layer, you must turn to Spring MVC
@@ -20,14 +29,11 @@ All the controller methods return one of Spring HATEOAS’s ResourceSupport subc
 public class ArticleController {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
-    private final ArticleResourceAssembler articleAssembler;
 
     ArticleController(ArticleRepository articleRepository,
-                      UserRepository userRepository,
-                      ArticleResourceAssembler articleAssembler) {
+                      UserRepository userRepository) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
-        this.articleAssembler = articleAssembler;
     }
 
     //Aggregate root - all articles
@@ -43,6 +49,12 @@ public class ArticleController {
 //        return new Resources<>(articles,
 //                linkTo(methodOn(ArticleController.class).all()).withSelfRel());
 //    }
+
+
+    @PostMapping("/articles")
+    public Article newArticle(@RequestBody Article newArticle) {
+        return articleRepository.save(newArticle);
+    }
 
     @GetMapping("/articles")
     public List<Article> getAllArticles() {
