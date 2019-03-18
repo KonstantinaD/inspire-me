@@ -1,0 +1,23 @@
+spring:
+  main:
+    banner-mode: 'off'
+  datasource:
+    url: jdbc:mysql://localhost:3306/inspire_me_db?useSSL=false
+    username: springuser
+    password: ThePassword
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    baselineOnMigrate: true
+
+---
+spring:
+  profiles: h2
+  datasource:
+    driver-class-name: org.h2.Driver
+    url:
+  h2:
+    console:
+      enabled: true
+      path: /console/
