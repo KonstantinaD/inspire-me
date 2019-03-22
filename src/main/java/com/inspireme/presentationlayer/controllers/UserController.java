@@ -22,18 +22,18 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class UserController {
-    private final UserRepository repository;
-    private final UserResourceAssembler assembler;
+    private final UserRepository userRepository;
+    private final UserResourceAssembler userAssembler;
 
-    UserController(UserRepository repository,  UserResourceAssembler assembler) {
-        this.repository = repository;
-        this.assembler = assembler;
+    UserController(UserRepository userRepository,  UserResourceAssembler userAssembler) {
+        this.userRepository = userRepository;
+        this.userAssembler = userAssembler;
     }
 
     @GetMapping("/users")
     public Resources<Resource<User>> getAllUsers() {
-        List<Resource<User>> users = repository.findAll().stream()
-                .map(assembler::toResource)
+        List<Resource<User>> users = userRepository.findAll().stream()
+                .map(userAssembler::toResource)
                 .collect(Collectors.toList());
 
         return new Resources<>(users,
@@ -44,21 +44,21 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public Resource<User> getUserById(@PathVariable Long userId) {
 
-        User user = repository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return assembler.toResource(user);
+        return userAssembler.toResource(user);
     }
 
     @PostMapping("/users")
     public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
-            Resource<User> resource = assembler.toResource(repository.save(newUser));
+            Resource<User> userResource = userAssembler.toResource(userRepository.save(newUser));
 
             return ResponseEntity
-                    .created(new URI(resource.getId().expand().getHref()))  //the italic is the http status
-                    .body(resource);
+                    .created(new URI(userResource.getId().expand().getHref()))  //the italic is the http status
+                    .body(userResource);
         }
 
         return ResponseEntity
@@ -67,26 +67,26 @@ public class UserController {
       }
 
     @PutMapping("/users/{userId}")
-    ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long userId) throws URISyntaxException{
+    ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long userId) throws URISyntaxException {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
 
-                User updatedUser = repository.findById(userId)
+                User updatedUser = userRepository.findById(userId)
                         .map(user -> {
                             user.setUserName(newUser.getUserName());
                             user.setUserType(newUser.getUserType());
-                            return repository.save(user);
+                            return userRepository.save(user);
                         })
                         .orElseGet(() -> {
                             //newUser.setUserId(userId);
-                            return repository.save(newUser);
+                            return userRepository.save(newUser);
                         });
 
-                Resource<User> resource = assembler.toResource(updatedUser);
+                Resource<User> userResource = userAssembler.toResource(updatedUser);
 
                 return ResponseEntity
-                        .created(new URI(resource.getId().expand().getHref()))
-                        .body(resource);
+                        .created(new URI(userResource.getId().expand().getHref()))
+                        .body(userResource);
             }
 
         return ResponseEntity
@@ -101,10 +101,10 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
-            repository.deleteById(userId);
+            userRepository.deleteById(userId);
 
             return ResponseEntity.noContent().build();
         }

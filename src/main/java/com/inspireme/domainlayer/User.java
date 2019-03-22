@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.inspireme.infrastructurelayer.EntityIdResolver;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 @Entity
 @Data
+@EqualsAndHashCode(exclude = "articles")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId", scope = User.class, resolver = EntityIdResolver.class)
 public class User {
     @Id
@@ -31,7 +33,7 @@ public class User {
 
     private LocalDateTime dateUserCreated = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "articlePublishedBy", cascade = CascadeType.ALL)
     @JsonBackReference
     private Set<Article> articles;
 }
