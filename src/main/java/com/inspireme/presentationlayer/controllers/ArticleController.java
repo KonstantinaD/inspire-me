@@ -1,12 +1,9 @@
 package com.inspireme.presentationlayer.controllers;
 
 import com.inspireme.domainlayer.Article;
-import com.inspireme.domainlayer.User;
-import com.inspireme.domainlayer.UserType;
-import com.inspireme.infrastructurelayer.ArticleRepository;
-import com.inspireme.infrastructurelayer.UserRepository;
 import com.inspireme.presentationlayer.assemblers.ArticleResourceAssembler;
 import com.inspireme.presentationlayer.notfoundexceptions.ArticleNotFoundException;
+import com.inspireme.servicelayer.services.ArticleService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
@@ -29,33 +26,19 @@ All the controller methods return one of Spring HATEOAS’s ResourceSupport subc
 
 @RestController  //RestController indicates that the data returned by each method will be written straight into the response body instead of rendering a view template (view model).
 public class ArticleController {
-    private final ArticleRepository articleRepository;
+
+    private final ArticleService articleService;
     private final ArticleResourceAssembler articleAssembler;
 
-    ArticleController(ArticleRepository articleRepository,
+    public ArticleController(ArticleService articleService,
                       ArticleResourceAssembler articleAssembler) {
-        this.articleRepository = articleRepository;
+        this.articleService = articleService;
         this.articleAssembler = articleAssembler;
     }
 
-    //Aggregate root - all articles
-//    @GetMapping("/articles")
-//    public Resources<Resource<Article>> all() {
-//        List<Resource<Article>> articles = articleRepository.findAll().stream()
-//                //.map(articleAssembler::toResource)
-//                .map(article -> new Resource<>(article,
-//                        linkTo(methodOn(ArticleController.class).one(article.getArticleId())).withSelfRel(),
-//                        linkTo(methodOn(ArticleController.class).all()).withRel("articles")))
-//                .collect(Collectors.toList());
-//
-//        return new Resources<>(articles,
-//                linkTo(methodOn(ArticleController.class).all()).withSelfRel());
-//    }
-
-
     @GetMapping("/articles")
     public Resources<Resource<Article>> getAllArticles() {
-        List<Resource<Article>> articles = articleRepository.findAll().stream()
+        List<Resource<Article>> articles = articleService.retrieveAllArticles().stream()
                 .map(articleAssembler::toResource)
                 .collect(Collectors.toList());
 
@@ -65,8 +48,8 @@ public class ArticleController {
 
     @GetMapping("/articles/category/{categoryId}")
     public Resources<Resource<Article>> getAllArticlesByCategoryId(@PathVariable Long categoryId) {
-        if ((categoryId >= 1) && (categoryId <= 4)) {
-            List<Resource<Article>> articles = articleRepository.findByCategoryId(categoryId).stream()
+        if (!articleService.retrieveAllArticlesPerCategory(categoryId).isEmpty()) {
+            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerCategory(categoryId).stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
@@ -77,19 +60,25 @@ public class ArticleController {
         return null;
     }
 
+    @GetMapping("/articles/relatedArticles/{categoryId}")
+    public List<Article> getRelatedArticles(@PathVariable Long categoryId) {
+        return articleService.retrieveRelatedArticles(categoryId);
+    }
+
     @GetMapping("/articles/{articleId}")
     public Resource<Article> getArticleById(@PathVariable Long articleId) {
-        Article article = articleRepository.findById(articleId)
+        Article article = articleService.retrieveArticle(articleId)
                 .orElseThrow((() -> new ArticleNotFoundException(articleId)));
 
         return articleAssembler.toResource(article);
     }
 
+
     @PostMapping("/articles")
     public ResponseEntity<?> createNewArticle(@RequestBody Article newArticle) throws URISyntaxException {
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
 
-            Resource<Article> articleResource = articleAssembler.toResource(articleRepository.save(newArticle));
+            Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
 
             return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))  //the italic is the http status
@@ -98,26 +87,24 @@ public class ArticleController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Article publisher not allowed", "An article can't be published by user with userId " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with userId 1 can publish articles."));
+                .body(new VndErrors.VndError("Article publisher not allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
     @PutMapping("/articles/{articleId}")
     public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
 
-            Article updatedArticle = articleRepository.findById(articleId)
+            Article updatedArticle = articleService.retrieveArticle(articleId)
                     .map(article -> {
                         article.setArticleTitle(newArticle.getArticleTitle());
                         article.setArticleText(newArticle.getArticleText());
                         article.setImageUrl(newArticle.getImageUrl());
                         article.setCategory(newArticle.getCategory());
-                        article.setArticlePublishedBy(newArticle.getArticlePublishedBy());
-                        //article.setComments(newArticle.getComments());
-                        return articleRepository.save(article);
+                        //article.setArticlePublishedBy(newArticle.getArticlePublishedBy());
+                        return articleService.saveArticle(article);
                     })
                     .orElseGet(() -> {
-                        //newArticle.setArticleId(articleId);
-                        return articleRepository.save(newArticle);
+                        return articleService.saveArticle(newArticle);
                     });
 
             Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
@@ -129,14 +116,14 @@ public class ArticleController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Article manipulator not allowed", "An article can't be updated or published by user with userId " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with userId 1 can update or publish articles."));
+                .body(new VndErrors.VndError("Article manipulator not allowed", "An article can't be updated or published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can update or publish articles."));
     }
 
     //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
     @DeleteMapping("articles/{articleId}")
     public ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
 
-        articleRepository.deleteById(articleId);
+        articleService.deleteArticle(articleId);
 
         return ResponseEntity.noContent().build();
     }

@@ -1,4 +1,4 @@
-package com.inspireme.infrastructurelayer;
+package com.inspireme.infrastructurelayer.repositories;
 
 import com.inspireme.domainlayer.User;
 import org.springframework.data.jpa.repository.JpaRepository;

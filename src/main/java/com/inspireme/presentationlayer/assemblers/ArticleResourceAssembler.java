@@ -19,7 +19,7 @@ public class ArticleResourceAssembler implements ResourceAssembler<Article, Reso
 
         return new Resource<>(article,
                 linkTo(methodOn(ArticleController.class).getArticleById(article.getArticleId())).withSelfRel(),
-                linkTo(methodOn(ArticleController.class).getAllArticlesByCategoryId(article.getCategory().getCategoryId())).withRel("category/{categoryId}"),
+                linkTo(methodOn(ArticleController.class).getAllArticlesByCategoryId(article.getCategory().getCategoryId())).withRel("articles/category/{categoryId}"),
                 linkTo(methodOn(ArticleController.class).getAllArticles()).withRel("articles"));
     }
 }

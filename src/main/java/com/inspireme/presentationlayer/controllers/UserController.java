@@ -2,9 +2,9 @@ package com.inspireme.presentationlayer.controllers;
 
 import com.inspireme.domainlayer.User;
 import com.inspireme.domainlayer.UserType;
-import com.inspireme.infrastructurelayer.UserRepository;
 import com.inspireme.presentationlayer.assemblers.UserResourceAssembler;
 import com.inspireme.presentationlayer.notfoundexceptions.UserNotFoundException;
+import com.inspireme.servicelayer.services.UserService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
@@ -22,17 +22,17 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class UserController {
-    private final UserRepository userRepository;
     private final UserResourceAssembler userAssembler;
+    private final UserService userService;
 
-    UserController(UserRepository userRepository,  UserResourceAssembler userAssembler) {
-        this.userRepository = userRepository;
+    UserController(UserService userService,  UserResourceAssembler userAssembler) {
+        this.userService = userService;
         this.userAssembler = userAssembler;
     }
 
     @GetMapping("/users")
     public Resources<Resource<User>> getAllUsers() {
-        List<Resource<User>> users = userRepository.findAll().stream()
+        List<Resource<User>> users = userService.retrieveAllUsers().stream()
                 .map(userAssembler::toResource)
                 .collect(Collectors.toList());
 
@@ -44,7 +44,7 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public Resource<User> getUserById(@PathVariable Long userId) {
 
-        User user = userRepository.findById(userId)
+        User user = userService.retrieveUser(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return userAssembler.toResource(user);
@@ -54,7 +54,7 @@ public class UserController {
     public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
-            Resource<User> userResource = userAssembler.toResource(userRepository.save(newUser));
+            Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser));
 
             return ResponseEntity
                     .created(new URI(userResource.getId().expand().getHref()))  //the italic is the http status
@@ -63,7 +63,7 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type not allowed", "You can't add a user whose user type is " + newUser.getUserType()));
+                .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType()));
       }
 
     @PutMapping("/users/{userId}")
@@ -71,15 +71,14 @@ public class UserController {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
 
-                User updatedUser = userRepository.findById(userId)
+                User updatedUser = userService.retrieveUser(userId)
                         .map(user -> {
                             user.setUserName(newUser.getUserName());
                             user.setUserType(newUser.getUserType());
-                            return userRepository.save(user);
+                            return userService.saveUser(user);
                         })
                         .orElseGet(() -> {
-                            //newUser.setUserId(userId);
-                            return userRepository.save(newUser);
+                            return userService.saveUser(newUser);
                         });
 
                 Resource<User> userResource = userAssembler.toResource(updatedUser);
@@ -91,12 +90,12 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type not allowed", "You can't add a user whose user type is " + newUser.getUserType()));
+                .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
         }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Updating the Admin user not allowed", "You can't update the user with userId " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Updating the Admin user not allowed", "You can't update the user with user id " + userId + ". This is the Admin user."));
 
     }
 
@@ -104,14 +103,14 @@ public class UserController {
     @DeleteMapping("users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
-            userRepository.deleteById(userId);
+            userService.deleteUser(userId);
 
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Deleting the Admin user not allowed", "You can't delete the user with userId " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Deleting the Admin user not allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
     }
 }
 

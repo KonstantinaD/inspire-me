@@ -37,12 +37,12 @@ public class Article {
     @JsonBackReference
     private Set<Comment> comments;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
     private Category category;
 
     @ManyToOne
     @JoinColumn
-    public User articlePublishedBy;
+    private User articlePublishedBy;
 
 }
