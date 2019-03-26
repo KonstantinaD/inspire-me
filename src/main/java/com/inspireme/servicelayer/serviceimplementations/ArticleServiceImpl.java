@@ -5,14 +5,17 @@ import com.inspireme.infrastructurelayer.repositories.ArticleRepository;
 import com.inspireme.servicelayer.services.ArticleService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
+
+    private final int MAX_RELATED_ARTICLES = 4;
 
     public ArticleServiceImpl(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
@@ -38,60 +41,29 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.deleteById(articleId);
     }
 
+
+    private void validateCategoryId(Long categoryId) {
+    }
+
     public List<Article> retrieveRelatedArticles(Long categoryId) {
 
-        if (!retrieveAllArticles().isEmpty() && (categoryId >= 1) && (categoryId <= 4)) {
-            List<Article> relatedArticles = new ArrayList<Article>();
+        validateCategoryId(categoryId);
 
-            List<Article> allArticles = retrieveAllArticles();
+        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(categoryId).stream()
+                .limit(MAX_RELATED_ARTICLES)
+                .collect(Collectors.toList());
 
-            int numberOfAllArticles = retrieveAllArticles().size();
+        if(articlesInSameCategory.size() < MAX_RELATED_ARTICLES){
 
-            //if (!retrieveAllArticlesPerCategory(categoryId).isEmpty()) {
-            List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(categoryId);
-            int numberOfArticlesInSameCategory = retrieveAllArticlesPerCategory(categoryId).size();
+            return Stream.concat(
+                    articlesInSameCategory.stream(),
+                    retrieveAllArticles().stream()
+                            .filter(article -> article.getCategory().getCategoryId() != categoryId)
+                            .limit(MAX_RELATED_ARTICLES - articlesInSameCategory.size())
+            ).collect(Collectors.toList());
+        }
 
-            if (numberOfArticlesInSameCategory >= 4) {
-                relatedArticles = retrieveAllArticlesPerCategory(categoryId).subList(0, 4);
-                return relatedArticles;
-            }
-
-
-            /*if (numberOfArticlesInSameCategory >= 1 && numberOfArticlesInSameCategory < 4)*/
-            else {
-
-                for (Article article : articlesInSameCategory) {
-                    relatedArticles.add(article);
-                }
-
-                int maxNumberOfArticlesFromOtherCategoriesToAdd = 4 - numberOfArticlesInSameCategory;
-                //  if (numberOfArticlesFromOtherCategoriesToAdd >= 3) {
-                    for (int num = 0; num < maxNumberOfArticlesFromOtherCategoriesToAdd; num++) {
-                       //if (maxNumberOfArticlesFromOtherCategoriesToAdd >= 3) {
-                        Article articleFromOtherCategoriesToAdd = articleRepository.findFromOtherCategoryIds(categoryId).get(num);
-                        relatedArticles.add(articleFromOtherCategoriesToAdd);
-                    }
-//                    else {
-//                    Article articleToAdd = retrieveAllArticles().get(maxNumberOfArticlesFromOtherCategoriesToAdd - num);
-//                    relatedArticles.add(articleToAdd);
-//                }
-
-                }
-                return relatedArticles;
-
-//                    } else {
-//                        return relatedArticles;// allArticles.subList(0, 4);
-//                    }
-//                }
-            }
-//            else {
-//                if (retrieveAllArticles().size() < 4) {
-//                    return retrieveAllArticles().subList(0, retrieveAllArticles().size());
-//                } else {
-//                    return retrieveAllArticles().subList(0, 4);
-//                }
-//            }
-        //}
-            return null;
+        return articlesInSameCategory;
     }
+
 }
