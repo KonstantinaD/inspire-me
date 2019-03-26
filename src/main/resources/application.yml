@@ -3,8 +3,8 @@ spring:
     banner-mode: 'off'
   datasource:
     url: jdbc:mysql://localhost:3306/inspire_me_db?useSSL=false
-    username: root
-    password: root
+    username: springuser
+    password: ThePassword
   jpa:
     hibernate:
       ddl-auto: update

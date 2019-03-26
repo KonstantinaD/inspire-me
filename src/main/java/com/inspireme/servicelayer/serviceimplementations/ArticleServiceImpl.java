@@ -1,6 +1,7 @@
 package com.inspireme.servicelayer.serviceimplementations;
 
 import com.inspireme.domainlayer.Article;
+import com.inspireme.domainlayer.Category;
 import com.inspireme.infrastructurelayer.repositories.ArticleRepository;
 import com.inspireme.servicelayer.services.ArticleService;
 import org.springframework.stereotype.Service;
@@ -41,29 +42,26 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.deleteById(articleId);
     }
 
+    public List<Article> retrieveRelatedArticles(Article targetArticle) {
 
-    private void validateCategoryId(Long categoryId) {
-    }
+        Category targetCategory = targetArticle.getCategory();
 
-    public List<Article> retrieveRelatedArticles(Long categoryId) {
-
-        validateCategoryId(categoryId);
-
-        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(categoryId).stream()
-                .limit(MAX_RELATED_ARTICLES)
-                .collect(Collectors.toList());
+        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory.getCategoryId())
+            .stream()
+            .filter(article -> !article.equals(targetArticle))
+            .limit(MAX_RELATED_ARTICLES)
+            .collect(Collectors.toList());
 
         if(articlesInSameCategory.size() < MAX_RELATED_ARTICLES){
 
             return Stream.concat(
                     articlesInSameCategory.stream(),
                     retrieveAllArticles().stream()
-                            .filter(article -> article.getCategory().getCategoryId() != categoryId)
+                            .filter(article -> !article.getCategory().equals(targetCategory))
                             .limit(MAX_RELATED_ARTICLES - articlesInSameCategory.size())
             ).collect(Collectors.toList());
         }
 
         return articlesInSameCategory;
     }
-
 }

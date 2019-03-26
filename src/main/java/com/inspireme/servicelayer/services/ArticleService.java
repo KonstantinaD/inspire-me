@@ -17,5 +17,5 @@ public interface ArticleService {
 
     void deleteArticle(Long articleId);
 
-    List<Article> retrieveRelatedArticles(Long categoryId);
+    List<Article> retrieveRelatedArticles(Article targetArticle);
 }

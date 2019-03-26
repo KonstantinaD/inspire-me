@@ -60,9 +60,9 @@ public class ArticleController {
         return null;
     }
 
-    @GetMapping("/articles/relatedArticles/{categoryId}")
-    public List<Article> getRelatedArticles(@PathVariable Long categoryId) {
-        return articleService.retrieveRelatedArticles(categoryId);
+    @GetMapping("/articles/relatedArticles/{article}")
+    public List<Article> getRelatedArticles(@PathVariable Article article) {
+        return articleService.retrieveRelatedArticles(article);
     }
 
     @GetMapping("/articles/{articleId}")
