@@ -7,14 +7,13 @@ import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Converter used by hateOs for link creation
  */
 @Component
 public class ObjectToIdConverter implements Converter<Object, String> {
-
-    private final String EMPTY_STRING = "";
 
     @Override
     public String convert(Object obj) {
@@ -23,18 +22,20 @@ public class ObjectToIdConverter implements Converter<Object, String> {
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
                 .map(field -> extractFieldValue(field, obj))
-                .orElse(EMPTY_STRING);
+                .orElseThrow(() -> new RuntimeException("HateOs Conversion Error: No @Id annotated field"));
     }
 
-    private String extractFieldValue(Field field, Object obj){
+    private String extractFieldValue(Field field, Object obj) {
         try {
             if (Modifier.isPrivate(field.getModifiers())) {
                 field.setAccessible(true);
             }
-            return String.valueOf(field.get(obj));
+            Object fieldValue = field.get(obj);
+            return Optional.ofNullable(fieldValue)
+                    .map(String::valueOf)
+                    .orElseThrow(() -> new RuntimeException("HateOs Conversion Error: Cannot get value from @Id annotated field"));
         } catch (IllegalAccessException e) {
-//            throw new Exception("HateOs Conversion Error");
-            return EMPTY_STRING;
+            throw new RuntimeException("HateOs Conversion Error", e);
         }
     }
 }

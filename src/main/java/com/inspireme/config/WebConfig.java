@@ -23,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * Fix hateos mapping problem, manually adding my custom objectToIdConverter to hateOs CONVERSION_SERVICE
+     * See {@linktourl https://github.com/spring-projects/spring-hateoas/issues/118}
      * See {@linktourl https://stackoverflow.com/questions/22240155/converter-from-pathvariable-domainobject-to-string-using-controllerlinkbuilde}
      */
     private DefaultFormattingConversionService getHateOsConversionService(){

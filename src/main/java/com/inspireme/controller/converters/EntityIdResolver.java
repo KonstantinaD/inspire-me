@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 
 public class EntityIdResolver implements ObjectIdResolver {
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public EntityIdResolver(final EntityManager entityManager) {
         this.entityManager = entityManager;
