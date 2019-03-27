@@ -48,14 +48,14 @@ public class ArticleController {
     }
 
     @GetMapping("/category/{category}")
-    public Resources<Resource<Article>> getAllArticlesByCategory(@PathVariable Category category) {
+    public Resources<Resource<Article>> getArticlesByCategory(@PathVariable Category category) {
         if (!articleService.retrieveAllArticlesPerCategory(category).isEmpty()) {
             List<Resource<Article>> articles = articleService.retrieveAllArticlesPerCategory(category).stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(articles,
-                    linkTo(methodOn(ArticleController.class).getAllArticlesByCategory(category)).withSelfRel());
+                    linkTo(methodOn(ArticleController.class).getArticlesByCategory(category)).withSelfRel());
         }
 
         return null;

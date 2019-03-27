@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.inspireme.controller.converters.EntityIdResolver;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@ToString(of = {"commentId", "dateCommentPublished"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "commentId", scope = Comment.class, resolver = EntityIdResolver.class)
 public class Comment {
     @Id

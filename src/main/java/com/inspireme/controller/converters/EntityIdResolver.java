@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.ObjectIdResolver;
 
 import javax.persistence.EntityManager;
 
-public class EntityIdResolver
-        implements ObjectIdResolver {
+public class EntityIdResolver implements ObjectIdResolver {
 
     private EntityManager entityManager;
 
@@ -15,11 +14,7 @@ public class EntityIdResolver
     }
 
     @Override
-    public void bindItem(
-            final ObjectIdGenerator.IdKey id,
-            final Object pojo) {
-
-    }
+    public void bindItem(final ObjectIdGenerator.IdKey id, final Object pojo) {}
 
     @Override
     public Object resolveId(final ObjectIdGenerator.IdKey id) {
@@ -28,14 +23,12 @@ public class EntityIdResolver
 
     @Override
     public ObjectIdResolver newForDeserialization(final Object context) {
-
         return this;
     }
 
     @Override
     public boolean canUseFor(final ObjectIdResolver resolverType) {
-
-        return false;
+        return resolverType.getClass() == EntityIdResolver.class;
     }
 
 }

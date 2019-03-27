@@ -7,6 +7,7 @@ import com.inspireme.controller.converters.EntityIdResolver;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "comments")
+@ToString(of = {"articleId", "articleTitle"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "articleId", scope = Article.class, resolver = EntityIdResolver.class)
 public class Article {
     @Id
@@ -39,5 +41,4 @@ public class Article {
     @ManyToOne
     @JoinColumn
     private User articlePublishedBy;
-
 }

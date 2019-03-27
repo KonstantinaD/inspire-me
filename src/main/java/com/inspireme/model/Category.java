@@ -16,7 +16,7 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "articles")
-@ToString
+@ToString(of = {"categoryId", "categoryName"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId", scope = Category.class, resolver = EntityIdResolver.class)
 public class Category {
     @Id

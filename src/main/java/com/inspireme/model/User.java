@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(exclude = "articles")
-@ToString
+@ToString(of = {"userId", "userName", "userType"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId", scope = User.class, resolver = EntityIdResolver.class)
 public class User {
     @Id
