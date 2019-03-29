@@ -1,7 +1,9 @@
 package com.inspireme.exception;
 
+import com.inspireme.model.Article;
+
 public class ArticleNotFoundException extends RuntimeException {
-    public ArticleNotFoundException(Long articleId) {
-        super("Could not find article " + articleId);
+    public ArticleNotFoundException(Article article) {
+        super("Could not find article " + article);
     }
 }

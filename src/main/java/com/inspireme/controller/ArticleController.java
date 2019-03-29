@@ -1,6 +1,7 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.ArticleResourceAssembler;
+import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
 import com.inspireme.service.ArticleService;
@@ -62,15 +63,26 @@ public class ArticleController {
     }
 
     @GetMapping("/relatedArticles/{article}")
-    public List<Article> getRelatedArticles(@PathVariable Article article) {
-        return articleService.retrieveRelatedArticles(article);
+//    public List<Article> getRelatedArticles(@PathVariable Article article) {
+//        return articleService.retrieveRelatedArticles(article);
+      public Resources<Resource<Article>> getRelatedArticles(@PathVariable Article article) {
+        if (!articleService.retrieveRelatedArticles(article).isEmpty()) {
+            List<Resource<Article>> relatedArticles = articleService.retrieveRelatedArticles(article).stream()
+                    .map(articleAssembler::toResource)
+                    .collect(Collectors.toList());
+
+            return new Resources<>(relatedArticles,
+                    linkTo(methodOn(ArticleController.class).getRelatedArticles(article)).withSelfRel());
+        }
+        return null;
     }
 
     @GetMapping("/{article}")
     public Resource<Article> getArticle(@PathVariable Article article) {
-        return articleAssembler.toResource(article);
+        Article articleToGet = articleService.retrieveArticle(article.getArticleId())
+                .orElseThrow((() -> new ArticleNotFoundException(article)));
+        return articleAssembler.toResource(articleToGet);
     }
-
 
     @PostMapping
     public ResponseEntity<?> createNewArticle(@RequestBody Article newArticle) throws URISyntaxException {
@@ -88,18 +100,18 @@ public class ArticleController {
                 .body(new VndErrors.VndError("Article publisher not allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
-    @PutMapping("/{articleId}")
-    public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
+    @PutMapping("/{article}")
+    public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Article article) throws URISyntaxException {
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
 
-            Article updatedArticle = articleService.retrieveArticle(articleId)
-                    .map(article -> {
+            Article updatedArticle = articleService.retrieveArticle(article.getArticleId())
+                    .map(articleToUpdate -> {
                         article.setArticleTitle(newArticle.getArticleTitle());
                         article.setArticleText(newArticle.getArticleText());
                         article.setImageUrl(newArticle.getImageUrl());
                         article.setCategory(newArticle.getCategory());
                         //article.setArticlePublishedBy(newArticle.getArticlePublishedBy());
-                        return articleService.saveArticle(article);
+                        return articleService.saveArticle(articleToUpdate);
                     })
                     .orElseGet(() -> {
                         return articleService.saveArticle(newArticle);
