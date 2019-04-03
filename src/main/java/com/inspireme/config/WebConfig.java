@@ -1,7 +1,6 @@
 package com.inspireme.config;
 
 import com.inspireme.controller.converters.ObjectToIdConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.support.DefaultFormattingConversionService;
@@ -13,8 +12,7 @@ import java.lang.reflect.Field;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private ObjectToIdConverter objectToIdConverter;
+    private final ObjectToIdConverter objectToIdConverter = new ObjectToIdConverter();
 
     @Override
     public void addFormatters(final FormatterRegistry registry) {
