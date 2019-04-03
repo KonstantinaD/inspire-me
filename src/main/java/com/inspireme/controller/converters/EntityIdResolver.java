@@ -7,10 +7,15 @@ import javax.persistence.EntityManager;
 
 public class EntityIdResolver implements ObjectIdResolver {
 
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
     public EntityIdResolver(final EntityManager entityManager) {
         this.entityManager = entityManager;
+    }
+
+    //TODO : wtf ??
+    public EntityIdResolver() {
+        System.out.printf("asfa");
     }
 
     @Override

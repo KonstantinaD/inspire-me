@@ -23,6 +23,9 @@ public class User {
 
     private String userName;
 
+    @ToString.Exclude
+    private String password;
+
     private UserType userType;
 
     private LocalDateTime dateUserCreated = LocalDateTime.now();

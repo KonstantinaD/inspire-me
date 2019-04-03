@@ -10,6 +10,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,16 +22,25 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping(path = "/users")
 public class UserController {
     private final UserResourceAssembler userAssembler;
     private final UserService userService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    UserController(UserService userService,  UserResourceAssembler userAssembler) {
+    UserController(UserService userService, UserResourceAssembler userAssembler, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userService = userService;
         this.userAssembler = userAssembler;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @GetMapping("/users")
+    @PostMapping("/sign-up")
+    public void signUp(@RequestBody User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userService.saveUser(user);
+    }
+
+    @GetMapping()
     public Resources<Resource<User>> getAllUsers() {
         List<Resource<User>> users = userService.retrieveAllUsers().stream()
                 .map(userAssembler::toResource)
@@ -41,7 +51,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public Resource<User> getUserById(@PathVariable Long userId) {
 
         User user = userService.retrieveUser(userId)
@@ -50,7 +60,7 @@ public class UserController {
         return userAssembler.toResource(user);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
@@ -66,7 +76,7 @@ public class UserController {
                 .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType()));
       }
 
-    @PutMapping("/users/{userId}")
+    @PutMapping("/{userId}")
     ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long userId) throws URISyntaxException {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
@@ -100,7 +110,7 @@ public class UserController {
     }
 
 
-    @DeleteMapping("users/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
             userService.deleteUser(userId);
