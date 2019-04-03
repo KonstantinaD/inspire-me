@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -78,11 +77,11 @@ public class ArticleController {
         return null;
     }
 
-    @GetMapping("/{article}")
-    public Resource<Article> getArticle(@PathVariable Article article) {
-        return Optional.ofNullable(article)
+    @GetMapping("/{articleId}")
+    public Resource<Article> getArticle(@PathVariable Long articleId) {
+        return articleService.retrieveArticle(articleId)
                 .map(articleAssembler::toResource)
-                .orElseThrow((() -> new ArticleNotFoundException()));
+                .orElseThrow((() -> new ArticleNotFoundException(articleId)));
     }
 
     @PostMapping

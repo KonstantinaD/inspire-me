@@ -14,6 +14,6 @@ public class ArticleNotFoundAdvice {
     @ExceptionHandler(ArticleNotFoundException.class)
     public ResponseEntity<ErrorMsg> handleArticleNotFoundException(ArticleNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMsg("article.not.found", "Article Not Found"));
+                .body(new ErrorMsg("article.not.found", "Article Not Found: " + e.getArticleId()));
     }
 }
