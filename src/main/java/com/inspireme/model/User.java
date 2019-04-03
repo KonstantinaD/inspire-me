@@ -15,24 +15,20 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(exclude = "articles")
-//@ToString(of = {"userId", "userName", "userType"})
-@ToString(onlyExplicitlyIncluded = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId", scope = User.class, resolver = EntityIdResolver.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ToString.Include
     private Long userId;
 
-    @ToString.Include
     private String userName;
 
-    @ToString.Include
     private UserType userType;
 
     private LocalDateTime dateUserCreated = LocalDateTime.now();
 
     @OneToMany(mappedBy = "articlePublishedBy", cascade = CascadeType.PERSIST)
     @JsonBackReference
+    @ToString.Exclude
     private Set<Article> articles;
 }
