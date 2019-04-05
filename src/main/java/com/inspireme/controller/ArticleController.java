@@ -8,12 +8,15 @@ import com.inspireme.service.ArticleService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
+import org.springframework.hateoas.core.EmbeddedWrapper;
+import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,12 +43,22 @@ public class ArticleController {
 
     @GetMapping
     public Resources<Resource<Article>> getAllArticles() {
-        List<Resource<Article>> articles = articleService.retrieveAllArticles().stream()
-                .map(articleAssembler::toResource)
-                .collect(Collectors.toList());
 
-        return new Resources<>(articles,
-                linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
+        if (!articleService.retrieveAllArticles().isEmpty()) {
+            List<Resource<Article>> articles = articleService.retrieveAllArticles().stream()
+                    .map(articleAssembler::toResource)
+                    .collect(Collectors.toList());
+
+            return new Resources<>(articles,
+                    linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
+        }
+
+//        EmbeddedWrappers wrappers = new EmbeddedWrappers(false);
+//        EmbeddedWrapper wrapper = wrappers.emptyCollectionOf(Article.class);
+//        Resources<Resource<Article>> resources = new Resources<>(Arrays.asList(wrapper));
+//        return resources;
+
+        return null;
     }
 
     @GetMapping("/category/{category}")
@@ -58,13 +71,10 @@ public class ArticleController {
             return new Resources<>(articles,
                     linkTo(methodOn(ArticleController.class).getArticlesByCategory(category)).withSelfRel());
         }
-
         return null;
     }
 
     @GetMapping("/relatedArticles/{article}")
-//    public List<Article> getRelatedArticles(@PathVariable Article article) {
-//        return articleService.retrieveRelatedArticles(article);
       public Resources<Resource<Article>> getRelatedArticles(@PathVariable Article article) {
         if (!articleService.retrieveRelatedArticles(article).isEmpty()) {
             List<Resource<Article>> relatedArticles = articleService.retrieveRelatedArticles(article).stream()
@@ -79,9 +89,9 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public Resource<Article> getArticle(@PathVariable Long articleId) {
-        return articleService.retrieveArticle(articleId)
-                .map(articleAssembler::toResource)
+        Article article = articleService.retrieveArticle(articleId)
                 .orElseThrow((() -> new ArticleNotFoundException(articleId)));
+        return articleAssembler.toResource(article);
     }
 
     @PostMapping
@@ -100,18 +110,18 @@ public class ArticleController {
                 .body(new VndErrors.VndError("Article publisher not allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
-    @PutMapping("/{article}")
-    public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Article article) throws URISyntaxException {
+    @PutMapping("/{articleId}")
+    public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
 
-            Article updatedArticle = articleService.retrieveArticle(article.getArticleId())
-                    .map(articleToUpdate -> {
+            Article updatedArticle = articleService.retrieveArticle(articleId)
+                    .map(article-> {
                         article.setArticleTitle(newArticle.getArticleTitle());
                         article.setArticleText(newArticle.getArticleText());
                         article.setImageUrl(newArticle.getImageUrl());
                         article.setCategory(newArticle.getCategory());
                         //article.setArticlePublishedBy(newArticle.getArticlePublishedBy());
-                        return articleService.saveArticle(articleToUpdate);
+                        return articleService.saveArticle(article);
                     })
                     .orElseGet(() -> {
                         return articleService.saveArticle(newArticle);

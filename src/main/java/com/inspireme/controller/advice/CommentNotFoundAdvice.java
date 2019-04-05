@@ -1,19 +1,19 @@
-package com.inspireme.controller.advice;
-
-import com.inspireme.exception.CommentNotFoundException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ControllerAdvice
-public class CommentNotFoundAdvice {
-        @ResponseBody
-        @ExceptionHandler(CommentNotFoundException.class)
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        String employeeNotFoundHandler(CommentNotFoundException ex) {
-            return ex.getMessage();
-        }
-    }
-
+//package com.inspireme.controller.advice;
+//
+//import com.inspireme.exception.CommentNotFoundException;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.web.bind.annotation.ControllerAdvice;
+//import org.springframework.web.bind.annotation.ExceptionHandler;
+//import org.springframework.web.bind.annotation.ResponseBody;
+//import org.springframework.web.bind.annotation.ResponseStatus;
+//
+//@ControllerAdvice
+//public class CommentNotFoundAdvice {
+//        @ResponseBody
+//        @ExceptionHandler(CommentNotFoundException.class)
+//        @ResponseStatus(HttpStatus.NOT_FOUND)
+//        String employeeNotFoundHandler(CommentNotFoundException ex) {
+//            return ex.getMessage();
+//        }
+//    }
+//

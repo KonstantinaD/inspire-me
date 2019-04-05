@@ -21,26 +21,32 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepository = articleRepository;
     }
 
+    @Override
     public Optional<Article> retrieveArticle(Long articleId) {
         return articleRepository.findById(articleId);
     }
 
+    @Override
     public List<Article> retrieveAllArticles() {
         return articleRepository.findAll();
     }
 
+    @Override
     public List<Article> retrieveAllArticlesPerCategory(Category category) {
         return articleRepository.findByCategory(category);
     }
 
+    @Override
     public Article saveArticle(Article article) {
         return articleRepository.save(article);
     }
 
+    @Override
     public void deleteArticle(Article article) {
         articleRepository.delete(article);
     }
 
+    @Override
     public List<Article> retrieveRelatedArticles(Article targetArticle) {
 
         Category targetCategory = targetArticle.getCategory();

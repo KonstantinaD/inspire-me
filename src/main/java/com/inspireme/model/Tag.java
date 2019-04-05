@@ -16,17 +16,16 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "articles")
-//@ToString(of = {"categoryId", "categoryName"})
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "categoryId", scope = Category.class, resolver = EntityIdResolver.class)
-public class Category {
+@ToString(of = {"tagId", "tagName"})
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tagId", scope = Category.class, resolver = EntityIdResolver.class)
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryId;
+    private Long tagId;
 
-    private String categoryName;
+    private String tagName;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     @JsonBackReference
-    @ToString.Exclude
     private Set<Article> articles;
 }

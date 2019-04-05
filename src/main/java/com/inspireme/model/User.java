@@ -25,6 +25,7 @@ public class User {
 
     private UserType userType;
 
+    @ToString.Exclude
     private LocalDateTime dateUserCreated = LocalDateTime.now();
 
     @OneToMany(mappedBy = "articlePublishedBy", cascade = CascadeType.PERSIST)

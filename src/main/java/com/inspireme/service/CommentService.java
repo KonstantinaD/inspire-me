@@ -1,5 +1,6 @@
 package com.inspireme.service;
 
+import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 
 import java.util.List;
@@ -11,9 +12,9 @@ public interface CommentService {
 
     List<Comment> retrieveAllComments();
 
-    List<Comment> retrieveAllCommentsPerArticle(Long articleId);
+    List<Comment> retrieveAllCommentsPerArticle(Article article);
 
     Comment saveComment(Comment comment);
 
-    void deleteComment(Long commentId);
+    void deleteComment(Comment comment);
 }

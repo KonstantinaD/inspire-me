@@ -2,6 +2,7 @@ package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.CommentResourceAssembler;
 import com.inspireme.exception.CommentNotFoundException;
+import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 import com.inspireme.service.CommentService;
 import org.springframework.hateoas.Resource;
@@ -18,6 +19,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping(path = "/comments")
 public class CommentController {
 
     private final CommentService commentService;
@@ -28,32 +30,36 @@ public class CommentController {
         this.commentAssembler = commentAssembler;
     }
 
-    @GetMapping("/comments")
+    @GetMapping
     public Resources<Resource<Comment>> getAllComments() {
-        List<Resource<Comment>> comments = commentService.retrieveAllComments().stream()
-                .map(commentAssembler::toResource)
-                .collect(Collectors.toList());
-
-        return new Resources<>(comments,
-                linkTo(methodOn(CommentController.class).getAllComments()).withSelfRel());
-    }
-
-    @GetMapping("/comments/article/{articleId}")
-    public Resources<Resource<Comment>> getAllCommentsByArticleId(@PathVariable Long articleId) {
-        if (!commentService.retrieveAllCommentsPerArticle(articleId).isEmpty()) {
-            List<Resource<Comment>> comments = commentService.retrieveAllCommentsPerArticle(articleId).stream()
+        if (!commentService.retrieveAllComments().isEmpty()) {
+            List<Resource<Comment>> comments = commentService.retrieveAllComments().stream()
                     .map(commentAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(comments,
-                    linkTo(methodOn(CommentController.class).getAllCommentsByArticleId(articleId)).withSelfRel());
+                    linkTo(methodOn(CommentController.class).getAllComments()).withSelfRel());
         }
 
         return null;
     }
 
-    @GetMapping("/comments/{commentId}")
-    public Resource<Comment> getCommentById(@PathVariable Long commentId) {
+    @GetMapping("/article/{article}")
+    public Resources<Resource<Comment>> getAllCommentsByArticle(@PathVariable Article article) {
+        if (!commentService.retrieveAllCommentsPerArticle(article).isEmpty()) {
+            List<Resource<Comment>> comments = commentService.retrieveAllCommentsPerArticle(article).stream()
+                    .map(commentAssembler::toResource)
+                    .collect(Collectors.toList());
+
+            return new Resources<>(comments,
+                    linkTo(methodOn(CommentController.class).getAllCommentsByArticle(article)).withSelfRel());
+        }
+
+        return null;
+    }
+
+    @GetMapping("/{commentId}")
+    public Resource<Comment> getComment(@PathVariable Long commentId) {
 
         Comment comment = commentService.retrieveComment(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
@@ -61,7 +67,7 @@ public class CommentController {
         return commentAssembler.toResource(comment);
     }
 
-    @PostMapping("/comments")
+    @PostMapping
     public ResponseEntity<?> createNewComment(@RequestBody Comment newComment) throws URISyntaxException {
         Resource<Comment> resource = commentAssembler.toResource(commentService.saveComment(newComment));
 
@@ -71,7 +77,7 @@ public class CommentController {
     }
 
     //PERMISSIONS - ONLY THE PUBLISHER OF THE COMMENT CAN EDIT/DELETE IT, THE BELOW ONLY PREVENTS THE COMMENT PUBLISHER ID FROM CHANGING
-    @PutMapping("/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<?> replaceComment(@RequestBody Comment newComment, @PathVariable Long commentId) throws URISyntaxException {
             Comment updatedComment = commentService.retrieveComment(commentId)
                     .map(comment -> {
@@ -92,10 +98,10 @@ public class CommentController {
     }
 
     //WE NEED TO ENSURE THE COMMENT CAN BE DELETED ONLY BY THE PERSON WHO PUBLISHED IT(THE ADMIN SHOULD BE ABLE TO DELETE ALL COMMENTS) - PERMISSIONS
-    @DeleteMapping("comments/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+    @DeleteMapping("/{comment}")
+    public ResponseEntity<?> deleteComment(@PathVariable Comment comment) {
 
-           commentService.deleteComment(commentId);
+           commentService.deleteComment(comment);
 
            return ResponseEntity.noContent().build();
     }

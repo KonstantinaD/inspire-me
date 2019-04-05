@@ -21,6 +21,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping(path = "/users")
 public class UserController {
     private final UserResourceAssembler userAssembler;
     private final UserService userService;
@@ -30,19 +31,22 @@ public class UserController {
         this.userAssembler = userAssembler;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public Resources<Resource<User>> getAllUsers() {
-        List<Resource<User>> users = userService.retrieveAllUsers().stream()
-                .map(userAssembler::toResource)
-                .collect(Collectors.toList());
+        if (!userService.retrieveAllUsers().isEmpty()) {
+            List<Resource<User>> users = userService.retrieveAllUsers().stream()
+                    .map(userAssembler::toResource)
+                    .collect(Collectors.toList());
 
-        return new Resources<>(users,
-                linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel()); //SelfRef comes from the Get mapping
+            return new Resources<>(users,
+                    linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel()); //SelfRef comes from the Get mapping
 
+        }
+        return null;
     }
 
-    @GetMapping("/users/{userId}")
-    public Resource<User> getUserById(@PathVariable Long userId) {
+    @GetMapping("/{userId}")
+    public Resource<User> getUser(@PathVariable Long userId) {
 
         User user = userService.retrieveUser(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -50,7 +54,7 @@ public class UserController {
         return userAssembler.toResource(user);
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
@@ -66,7 +70,7 @@ public class UserController {
                 .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType()));
       }
 
-    @PutMapping("/users/{userId}")
+    @PutMapping("/{userId}")
     ResponseEntity<?> replaceUser(@RequestBody User newUser, @PathVariable Long userId) throws URISyntaxException {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
@@ -100,17 +104,17 @@ public class UserController {
     }
 
 
-    @DeleteMapping("users/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        if (userId != 1) {
-            userService.deleteUser(userId);
+    @DeleteMapping("/{user}")
+    public ResponseEntity<?> deleteUser(@PathVariable User user) {
+        if (user.getUserId() != 1) {
+            userService.deleteUser(user);
 
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Deleting the Admin user not allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Deleting the Admin user not allowed", "You can't delete the user with user id " + user.getUserId() + ". This is the Admin user."));
     }
 }
 

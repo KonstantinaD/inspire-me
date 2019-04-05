@@ -17,7 +17,7 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "comments")
-@ToString(of = {"articleId", "articleTitle"})
+//@ToString(of = {"articleId", "articleTitle"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "articleId", scope = Article.class, resolver = EntityIdResolver.class)
 public class Article {
     @Id
@@ -25,20 +25,33 @@ public class Article {
     private Long articleId;
 
     private String articleTitle;
+
+    @ToString.Exclude
     private String articleText;
+
+    @ToString.Exclude
     private String imageUrl;
 
+    @ToString.Exclude
     private LocalDateTime dateArticlePublished = LocalDateTime.now();
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     @JsonBackReference
+    @ToString.Exclude
     private Set<Comment> comments;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
+    @ToString.Exclude
     private Category category;
 
     @ManyToOne
     @JoinColumn
+    @ToString.Exclude
     private User articlePublishedBy;
+
+//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+//    @JoinColumn(nullable = false)
+//    private Set<Tag> tags;
+
 }
