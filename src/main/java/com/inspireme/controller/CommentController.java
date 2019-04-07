@@ -83,6 +83,7 @@ public class CommentController {
                     .map(comment -> {
                         comment.setCommentText(newComment.getCommentText());
                         comment.setArticle(newComment.getArticle());
+                        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated
                         //comment.setCommentPublishedBy(newComment.getCommentPublishedBy());
                         return commentService.saveComment(comment);
                     })

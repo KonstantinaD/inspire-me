@@ -16,7 +16,6 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "articles")
-@ToString(of = {"tagId", "tagName"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tagId", scope = Category.class, resolver = EntityIdResolver.class)
 public class Tag {
     @Id
@@ -25,7 +24,8 @@ public class Tag {
 
     private String tagName;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonBackReference
+    @ToString.Exclude
     private Set<Article> articles;
 }

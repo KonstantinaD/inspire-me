@@ -62,7 +62,7 @@ public class ArticleServiceImplTest {
     @Test
     public void sameCategoryArticlesLessThanMax_returnSameAndDifferentArticleCategories() {
 
-        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_1);
+        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_1.getArticleId());
 
         assertThat(articleList).containsExactly(ARTICLE_2, ARTICLE_6, ARTICLE_3, ARTICLE_4);
     }
@@ -70,7 +70,7 @@ public class ArticleServiceImplTest {
     @Test
     public void sameCategoryArticlesEqualToMax_returnSameArticleCategories() {
 
-        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_9);
+        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_9.getArticleId());
 
         assertThat(articleList).containsExactly(ARTICLE_3, ARTICLE_4, ARTICLE_5, ARTICLE_8);
     }
@@ -78,7 +78,7 @@ public class ArticleServiceImplTest {
     @Test
     public void noOtherSameCategoryArticles_returnDifferentArticleCategories() {
 
-        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_7);
+        List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_7.getArticleId());
 
         assertThat(articleList).containsExactly(ARTICLE_1, ARTICLE_2, ARTICLE_3, ARTICLE_4);
     }

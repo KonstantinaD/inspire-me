@@ -35,7 +35,7 @@ public class Article {
     @ToString.Exclude
     private LocalDateTime dateArticlePublished = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonBackReference
     @ToString.Exclude
     private Set<Comment> comments;
@@ -50,8 +50,29 @@ public class Article {
     @ToString.Exclude
     private User articlePublishedBy;
 
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-//    @JoinColumn(nullable = false)
-//    private Set<Tag> tags;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "article_tags",
+            joinColumns = { @JoinColumn(name = "article_id") },
+            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+    private Set<Tag> tags;
+
+//    @PrePersist
+//    public void addTag(Tag tag) {
+//
+//        this.tags.add(tag);
+//
+//        if (!tag.getArticles().contains(this)) {
+//            tag.add(this);
+//        }
+//    }
+//
+//    @PrePersist
+//    public void populateTags {
+//      for (Tag tag : tags) {
+//          if (!tag.getArticles().contains(this)) {
+//            tag.addToArticleList(this);
+//        }
+//      }
+//    }
 
 }

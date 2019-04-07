@@ -67,7 +67,7 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType()));
+                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType()));
       }
 
     @PutMapping("/{userId}")
@@ -94,27 +94,33 @@ public class UserController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type not allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
+                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
         }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Updating the Admin user not allowed", "You can't update the user with user id " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Updating the Admin User Not Allowed", "You can't update the user with user id " + userId + ". This is the Admin user."));
 
     }
 
 
-    @DeleteMapping("/{user}")
-    public ResponseEntity<?> deleteUser(@PathVariable User user) {
-        if (user.getUserId() != 1) {
-            userService.deleteUser(user);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        if (userId != 1) {
+            if (userService.retrieveUser(userId).isPresent()) {
+                userService.deleteUser(userId);
 
-            return ResponseEntity.noContent().build();
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new VndErrors.VndError("User Not Found", "You can't delete the user with user id " + userId + ". This user doesn't exist."));
         }
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Deleting the Admin user not allowed", "You can't delete the user with user id " + user.getUserId() + ". This is the Admin user."));
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
     }
 }
+
+
 

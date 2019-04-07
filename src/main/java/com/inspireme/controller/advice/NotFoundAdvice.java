@@ -4,6 +4,7 @@ package com.inspireme.controller.advice;
 
 import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.exception.CommentNotFoundException;
+import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.exception.UserNotFoundException;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
@@ -33,5 +34,12 @@ public class NotFoundAdvice {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new VndErrors.VndError("User Not Found", "Couldn't find user with user id " + e.getUserId()));
+    }
+
+    @ExceptionHandler(TagNotFoundException.class)
+    public ResponseEntity<?> handleTagNotFoundException(TagNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new VndErrors.VndError("Tag Not Found", "Couldn't find tag with tag id " + e.getTagId()));
     }
 }

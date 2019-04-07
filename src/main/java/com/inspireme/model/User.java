@@ -28,7 +28,7 @@ public class User {
     @ToString.Exclude
     private LocalDateTime dateUserCreated = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "articlePublishedBy", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "articlePublishedBy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonBackReference
     @ToString.Exclude
     private Set<Article> articles;

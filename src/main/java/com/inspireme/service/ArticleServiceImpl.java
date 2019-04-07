@@ -2,9 +2,11 @@ package com.inspireme.service;
 
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
+import com.inspireme.model.Tag;
 import com.inspireme.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +39,11 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<Article> retrieveAllArticlesPerTag(Tag tag) {
+        return articleRepository.findByTags(tag);
+    }
+
+    @Override
     public Article saveArticle(Article article) {
         return articleRepository.save(article);
     }
@@ -47,13 +54,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<Article> retrieveRelatedArticles(Article targetArticle) {
+    public List<Article> retrieveRelatedArticles(Long targetArticleId) {
 
-        Category targetCategory = targetArticle.getCategory();
+        Optional<Article> targetArticle = retrieveArticle(targetArticleId);
+
+        Category targetCategory = targetArticle.get().getCategory();
 
         List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory)
             .stream()
-            .filter(article -> !article.equals(targetArticle))
+            .filter(article -> !article.equals(targetArticle.get()))
             .limit(MAX_RELATED_ARTICLES)
             .collect(Collectors.toList());
 

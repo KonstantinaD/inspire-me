@@ -4,6 +4,7 @@ import com.inspireme.controller.assemblers.ArticleResourceAssembler;
 import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
+import com.inspireme.model.Tag;
 import com.inspireme.service.ArticleService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,15 +76,28 @@ public class ArticleController {
         return null;
     }
 
-    @GetMapping("/relatedArticles/{article}")
-      public Resources<Resource<Article>> getRelatedArticles(@PathVariable Article article) {
-        if (!articleService.retrieveRelatedArticles(article).isEmpty()) {
-            List<Resource<Article>> relatedArticles = articleService.retrieveRelatedArticles(article).stream()
+    @GetMapping("/tags/{tag}") //To DO: implement when not existing tag is called - return TAG NOT FOUND - AND an empty array for a tag which contains no articles
+    public Resources<Resource<Article>> getArticlesByTag(@PathVariable Tag tag) {
+        if (!articleService.retrieveAllArticlesPerTag(tag).isEmpty()) {
+            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerTag(tag).stream()
+                    .map(articleAssembler::toResource)
+                    .collect(Collectors.toList());
+
+            return new Resources<>(articles,
+                    linkTo(methodOn(ArticleController.class).getArticlesByTag(tag)).withSelfRel());
+        }
+        return null;
+    }
+
+    @GetMapping("/relatedArticles/{articleId}")
+      public Resources<Resource<Article>> getRelatedArticles(@PathVariable Long articleId) {
+        if (!articleService.retrieveRelatedArticles(articleId).isEmpty()) {
+            List<Resource<Article>> relatedArticles = articleService.retrieveRelatedArticles(articleId).stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(relatedArticles,
-                    linkTo(methodOn(ArticleController.class).getRelatedArticles(article)).withSelfRel());
+                    linkTo(methodOn(ArticleController.class).getRelatedArticles(articleId)).withSelfRel());
         }
         return null;
     }
@@ -107,7 +122,7 @@ public class ArticleController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Article publisher not allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
+                .body(new VndErrors.VndError("Article Publisher Not Allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
     @PutMapping("/{articleId}")
@@ -136,7 +151,7 @@ public class ArticleController {
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Article manipulator not allowed", "An article can't be updated or published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can update or publish articles."));
+                .body(new VndErrors.VndError("Article Manipulator Not Allowed", "An article can't be edited or published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can edit or publish articles."));
     }
 
     //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
