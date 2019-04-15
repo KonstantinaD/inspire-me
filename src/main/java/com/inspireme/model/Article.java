@@ -52,27 +52,11 @@ public class Article {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "article_tags",
-            joinColumns = { @JoinColumn(name = "article_id") },
-            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
+            joinColumns = @JoinColumn(name = "article_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @ToString.Exclude
     private Set<Tag> tags;
 
-//    @PrePersist
-//    public void addTag(Tag tag) {
-//
-//        this.tags.add(tag);
-//
-//        if (!tag.getArticles().contains(this)) {
-//            tag.add(this);
-//        }
-//    }
-//
-//    @PrePersist
-//    public void populateTags {
-//      for (Tag tag : tags) {
-//          if (!tag.getArticles().contains(this)) {
-//            tag.addToArticleList(this);
-//        }
-//      }
-//    }
-
 }
+
+

@@ -25,7 +25,7 @@ public class Category {
 
     private String categoryName;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonBackReference
     @ToString.Exclude
     private Set<Article> articles;

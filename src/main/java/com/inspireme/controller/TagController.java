@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -94,7 +96,7 @@ public class TagController {
             return null;
         }
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
+                .status(HttpStatus.NOT_FOUND)
                 .body(new VndErrors.VndError("Tag Not Found", "The tag with tag id " + tag.getTagId() + " doesn't exist."));
     }
 
@@ -111,7 +113,7 @@ public class TagController {
         }
 
         return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
+                .status(HttpStatus.NOT_FOUND)
                 .body(new VndErrors.VndError("Tag Not Found", "The tag with tag id " + tag.getTagId() + " doesn't exist."));
     }
 }

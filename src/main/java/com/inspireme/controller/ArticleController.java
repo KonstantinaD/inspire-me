@@ -6,6 +6,7 @@ import com.inspireme.model.Article;
 import com.inspireme.model.Category;
 import com.inspireme.model.Tag;
 import com.inspireme.service.ArticleService;
+import com.inspireme.service.TagService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
@@ -36,11 +37,13 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private final ArticleResourceAssembler articleAssembler;
+    private final TagService tagService;
 
     public ArticleController(ArticleService articleService,
-                      ArticleResourceAssembler articleAssembler) {
+                      ArticleResourceAssembler articleAssembler, TagService tagService) {
         this.articleService = articleService;
         this.articleAssembler = articleAssembler;
+        this.tagService = tagService;
     }
 
     @GetMapping
@@ -162,6 +165,14 @@ public class ArticleController {
 
         return ResponseEntity.noContent().build();
     }
+
+//    @DeleteMapping("/{article}/{tag}")
+//    public void deleteTagFromArticle(@PathVariable Article article, @PathVariable Tag tag) {
+//
+//        tagService.deleteTagPerArticle(article, tag);
+//
+//        //return ResponseEntity.noContent().build();
+//    }
 }
 
 //    /* The Article object built from the save() operation is then turned into its resource-based version - wrapped using the ArticleResourceAssembler into a Resource<Article> object

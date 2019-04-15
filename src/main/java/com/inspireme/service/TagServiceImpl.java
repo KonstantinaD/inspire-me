@@ -31,4 +31,9 @@ public class TagServiceImpl implements TagService{
     public List<Tag> retrieveAllTagsPerArticle(Article article) {
         return tagRepository.findByArticle(article);
     }
+
+//    @Override
+//    public void deleteTagPerArticle(Article article, Tag tag) {
+//    tagRepository.deleteByArticle(article, tag);
+//    }
 }

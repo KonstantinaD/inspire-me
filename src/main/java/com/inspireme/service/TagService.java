@@ -14,4 +14,6 @@ public interface TagService {
     List<Tag> retrieveAllTags();
 
     List<Tag> retrieveAllTagsPerArticle(Article article);
+
+//    void deleteTagPerArticle(Article article, Tag tag);
 }
