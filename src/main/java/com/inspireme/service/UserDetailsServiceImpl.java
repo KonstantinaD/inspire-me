@@ -18,14 +18,18 @@ import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+    //@Autowired
+    private final UserRepository userRepository;
+
+    public UserDetailsServiceImpl(UserRepository userRepository) {   //diff with tutorial, where it's Autowired only
+        this.userRepository = userRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) throw new UsernameNotFoundException(username);
+    public UserDetails loadUserByUsername(String userName) {
+        User user = userRepository.findByUserName(userName);
+        if (user == null) throw new UsernameNotFoundException(userName);
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         //for (Role role : user.getRoles()){
