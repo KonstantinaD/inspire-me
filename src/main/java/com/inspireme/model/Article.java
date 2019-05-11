@@ -7,6 +7,8 @@ import com.inspireme.controller.converters.EntityIdResolver;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -23,9 +25,11 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long articleId;
 
+    @NotEmpty(message = "Please provide a title")
     private String articleTitle;
 
     @ToString.Exclude
+    @NotEmpty(message = "Please provide text for the article")
     private String articleText;
 
     @ToString.Exclude
@@ -42,11 +46,13 @@ public class Article {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
     @ToString.Exclude
+    @NotNull(message = "Please provide a category")
     private Category category;
 
     @ManyToOne
     @JoinColumn
     @ToString.Exclude
+    @NotNull(message = "Please provide a publisher")
     private User articlePublishedBy;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

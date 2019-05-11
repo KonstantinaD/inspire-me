@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -121,7 +122,8 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createNewArticle(@RequestBody Article newArticle) throws URISyntaxException {
+    public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle) throws URISyntaxException {
+
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
 
             Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
