@@ -4,10 +4,7 @@ package com.inspireme.controller.advice;
 
 import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
 import com.fasterxml.jackson.databind.deser.UnresolvedId;
-import com.inspireme.exception.ArticleNotFoundException;
-import com.inspireme.exception.CommentNotFoundException;
-import com.inspireme.exception.TagNotFoundException;
-import com.inspireme.exception.UserNotFoundException;
+import com.inspireme.exception.*;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +46,12 @@ public class NotFoundAdvice {
                 .body(new VndErrors.VndError("Tag Not Found", "Couldn't find tag with tag id " + e.getTagId()));
     }
 
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<?> handle(CategoryNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new VndErrors.VndError("Category Not Found", "Couldn't find category with category id " + e.getCategoryId()));
+    }
 
     @ExceptionHandler(UnresolvedForwardReference.class)
     public ResponseEntity<?> handleMessageNotReadableException(HttpServletRequest request, UnresolvedForwardReference exception) {

@@ -1,8 +1,6 @@
 package com.inspireme.service;
 
 import com.inspireme.model.Article;
-import com.inspireme.model.Category;
-import com.inspireme.model.Tag;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +11,9 @@ public interface ArticleService {
 
     List<Article> retrieveAllArticles();
 
-    List<Article> retrieveAllArticlesPerCategory(Category category);
+    List<Article> retrieveAllArticlesPerCategory(Long categoryId);
 
-    List<Article> retrieveAllArticlesPerTag(Tag tag);
+    List<Article> retrieveAllArticlesPerTag(Long tagId);
 
     Article saveArticle(Article article);
 

@@ -4,7 +4,6 @@ import com.inspireme.controller.assemblers.ArticleResourceAssembler;
 import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.model.Article;
-import com.inspireme.model.Category;
 import com.inspireme.model.Tag;
 import com.inspireme.service.ArticleService;
 import com.inspireme.service.TagService;
@@ -63,28 +62,28 @@ public class ArticleController {
         return null;
     }
 
-    @GetMapping("/category/{category}")
-    public Resources<Resource<Article>> getArticlesByCategory(@PathVariable Category category) {
-        if (!articleService.retrieveAllArticlesPerCategory(category).isEmpty()) {
-            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerCategory(category).stream()
+    @GetMapping("/category/{categoryId}")
+    public Resources<Resource<Article>> getArticlesByCategory(@PathVariable Long categoryId) {
+        if (!articleService.retrieveAllArticlesPerCategory(categoryId).isEmpty()) {
+            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerCategory(categoryId).stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(articles,
-                    linkTo(methodOn(ArticleController.class).getArticlesByCategory(category)).withSelfRel());
+                    linkTo(methodOn(ArticleController.class).getArticlesByCategory(categoryId)).withSelfRel());
         }
         return null;
     }
 
-    @GetMapping("/tags/{tag}") //To DO: implement when not existing tag is called - return TAG NOT FOUND - AND an empty array for a tag which contains no articles
-    public Resources<Resource<Article>> getArticlesByTag(@PathVariable Tag tag) {
-        if (!articleService.retrieveAllArticlesPerTag(tag).isEmpty()) {
-            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerTag(tag).stream()
+    @GetMapping("/tags/{tagId}") //To DO: implement when not existing tag is called - return TAG NOT FOUND - AND an empty array for a tag which contains no articles
+    public Resources<Resource<Article>> getArticlesByTag(@PathVariable Long tagId) {
+        if (!articleService.retrieveAllArticlesPerTag(tagId).isEmpty()) {
+            List<Resource<Article>> articles = articleService.retrieveAllArticlesPerTag(tagId).stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(articles,
-                    linkTo(methodOn(ArticleController.class).getArticlesByTag(tag)).withSelfRel());
+                    linkTo(methodOn(ArticleController.class).getArticlesByTag(tagId)).withSelfRel());
         }
         return null;
     }

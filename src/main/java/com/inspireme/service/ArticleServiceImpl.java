@@ -1,9 +1,13 @@
 package com.inspireme.service;
 
+import com.inspireme.exception.CategoryNotFoundException;
+import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
 import com.inspireme.model.Tag;
 import com.inspireme.repository.ArticleRepository;
+import com.inspireme.repository.CategoryRepository;
+import com.inspireme.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +19,15 @@ import java.util.stream.Stream;
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
     private final int MAX_RELATED_ARTICLES = 4;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository) {
         this.articleRepository = articleRepository;
+        this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -33,12 +41,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<Article> retrieveAllArticlesPerCategory(Category category) {
+    public List<Article> retrieveAllArticlesPerCategory(Long categoryId) {
+
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
         return articleRepository.findByCategory(category);
     }
 
     @Override
-    public List<Article> retrieveAllArticlesPerTag(Tag tag) {
+    public List<Article> retrieveAllArticlesPerTag(Long tagId) {
+        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
+
         return articleRepository.findByTags(tag);
     }
 
@@ -59,7 +73,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Category targetCategory = targetArticle.get().getCategory();
 
-        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory)
+        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory.getCategoryId())
             .stream()
             .filter(article -> !article.equals(targetArticle.get()))
             .limit(MAX_RELATED_ARTICLES)
