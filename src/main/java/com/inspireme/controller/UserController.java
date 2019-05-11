@@ -118,7 +118,7 @@ public class UserController {
                 .status(HttpStatus.FORBIDDEN)
                 .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
     }
-    }
+}
 
 
 

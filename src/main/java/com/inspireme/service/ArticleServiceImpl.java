@@ -1,5 +1,6 @@
 package com.inspireme.service;
 
+import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.exception.CategoryNotFoundException;
 import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.model.Article;
@@ -11,7 +12,6 @@ import com.inspireme.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,8 +31,25 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Optional<Article> retrieveArticle(Long articleId) {
-        return articleRepository.findById(articleId);
+    public Article retrieveArticle(Long articleId) {
+
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException(articleId));
+    }
+
+    @Override
+    public Article replaceArticle(Long articleId, Article newArticle) {
+
+        Article updatedArticle = articleRepository.findById(articleId)
+                .orElseGet(Article::new);
+
+        updatedArticle.setArticleTitle(newArticle.getArticleTitle());
+        updatedArticle.setArticleText(newArticle.getArticleText());
+        updatedArticle.setImageUrl(newArticle.getImageUrl());
+        updatedArticle.setCategory(newArticle.getCategory());
+        updatedArticle.setArticlePublishedBy(newArticle.getArticlePublishedBy());
+
+        return saveArticle(updatedArticle);
     }
 
     @Override
@@ -69,13 +86,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> retrieveRelatedArticles(Long targetArticleId) {
 
-        Optional<Article> targetArticle = retrieveArticle(targetArticleId);
+        Article targetArticle = retrieveArticle(targetArticleId);
 
-        Category targetCategory = targetArticle.get().getCategory();
+        Category targetCategory = targetArticle.getCategory();
 
         List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory.getCategoryId())
             .stream()
-            .filter(article -> !article.equals(targetArticle.get()))
+            .filter(article -> !article.equals(targetArticle))
             .limit(MAX_RELATED_ARTICLES)
             .collect(Collectors.toList());
 

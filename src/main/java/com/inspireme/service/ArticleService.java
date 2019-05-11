@@ -3,11 +3,12 @@ package com.inspireme.service;
 import com.inspireme.model.Article;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ArticleService {
 
-    Optional<Article> retrieveArticle(Long articleId);
+    Article retrieveArticle(Long articleId);
+
+    Article replaceArticle(Long articleId, Article newArticle);
 
     List<Article> retrieveAllArticles();
 
