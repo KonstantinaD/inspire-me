@@ -2,6 +2,8 @@ package com.inspireme.controller.advice;
 
 /*When e.g. an ArticleNotFoundException is thrown, this part of Spring MVC configuration is used to render an HTTP 404*/
 
+import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
+import com.fasterxml.jackson.databind.deser.UnresolvedId;
 import com.inspireme.exception.ArticleNotFoundException;
 import com.inspireme.exception.CommentNotFoundException;
 import com.inspireme.exception.TagNotFoundException;
@@ -11,6 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class NotFoundAdvice {
@@ -41,5 +47,25 @@ public class NotFoundAdvice {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new VndErrors.VndError("Tag Not Found", "Couldn't find tag with tag id " + e.getTagId()));
+    }
+
+
+    @ExceptionHandler(UnresolvedForwardReference.class)
+    public ResponseEntity<?> handleMessageNotReadableException(HttpServletRequest request, UnresolvedForwardReference exception) {
+
+        List<VndErrors> errorList = exception.getUnresolvedIds().stream()
+                .map(this::buildVndError)
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorList);
+    }
+
+    private VndErrors buildVndError(UnresolvedId unresolvedId){
+        return new VndErrors(
+                unresolvedId.getType().getSimpleName() + " not found",
+                "Couldn't find " + unresolvedId.getType().getSimpleName() + " with id " + unresolvedId.getId()
+        );
     }
 }
