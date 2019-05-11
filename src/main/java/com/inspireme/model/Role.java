@@ -1,12 +1,14 @@
 package com.inspireme.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Data
 public class Role {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

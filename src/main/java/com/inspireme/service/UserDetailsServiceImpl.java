@@ -2,7 +2,6 @@ package com.inspireme.service;
 
 import com.inspireme.model.User;
 import com.inspireme.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         //for (Role role : user.getRoles()){
-            grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole().getClass().getName()));
+            grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
         //}
 
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), grantedAuthorities);

@@ -8,20 +8,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
   flyway:
     baselineOnMigrate: true
-#  mvc:
-#    view:
-#      prefix: webapp/resources/WEB-INF/view/
-#      suffix: .jsp
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
   messages:
     basename: validation
 
-logging:
-  level:
-    org:
-      springframework: TRACE
-    com: TRACE
+#logging:
+#  level:
+#    org:
+#      springframework: TRACE
+#    com: TRACE
 ---
 spring:
   profiles: h2

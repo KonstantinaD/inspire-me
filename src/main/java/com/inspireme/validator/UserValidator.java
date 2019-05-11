@@ -11,7 +11,7 @@ import org.springframework.validation.Validator;
 
 @Component
 public class UserValidator implements Validator {
-//    @Autowired
+
     private final UserService userService;
 
     public UserValidator(UserService userService) {   //diff with tutorial, where it's Autowired only

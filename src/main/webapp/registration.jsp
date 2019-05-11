@@ -16,7 +16,7 @@
 
   <body>
     <div class="container">
-        <form:form method="POST" modelAttribute="userForm" modelAttribute1="roleId" class="form-signin">
+        <form:form method="POST" modelAttribute="userForm" class="form-signin">
             <h2 class="form-signin-heading">Create Your Account</h2>
             <spring:bind path="userName">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
