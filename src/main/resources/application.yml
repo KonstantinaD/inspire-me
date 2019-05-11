@@ -10,12 +10,18 @@ spring:
       ddl-auto: update
   flyway:
     baselineOnMigrate: true
-  mvc:
-    view:
-      prefix: /
-      suffix: .jsp
+#  mvc:
+#    view:
+#      prefix: webapp/resources/WEB-INF/view/
+#      suffix: .jsp
   messages:
     basename: validation
+
+logging:
+  level:
+    org:
+      springframework: TRACE
+    com: TRACE
 ---
 spring:
   profiles: h2

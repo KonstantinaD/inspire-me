@@ -1,12 +1,9 @@
-package com.inspireme.Validator;
+package com.inspireme.validator;
 
-//To provide input-data validation for /registration controller with Spring Validator, we implement org.springframework.validation.Validator. Error codes, e.g. Size.userForm.username, are defined by validation.properties
+//To provide input-data validation for /registration controller with Spring validator, we implement org.springframework.validation.validator. Error codes, e.g. Size.userForm.username, are defined by validation.properties
 
 import com.inspireme.model.User;
 import com.inspireme.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;

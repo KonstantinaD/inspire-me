@@ -1,6 +1,6 @@
 package com.inspireme.controller;
 
-import com.inspireme.Validator.UserValidator;
+import com.inspireme.validator.UserValidator;
 import com.inspireme.controller.assemblers.UserResourceAssembler;
 import com.inspireme.exception.UserNotFoundException;
 import com.inspireme.model.User;
@@ -12,19 +12,23 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@RestController
+@Controller
+//@RestController
 //@RequestMapping(path = "/users")
 public class UserController {
     private final UserResourceAssembler userAssembler;
@@ -40,6 +44,7 @@ public class UserController {
     }
 
     @GetMapping
+    @ResponseBody
     public Resources<Resource<User>> getAllUsers() {
         if (!userService.retrieveAllUsers().isEmpty()) {
             List<Resource<User>> users = userService.retrieveAllUsers().stream()
@@ -53,6 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @ResponseBody
     public Resource<User> getUser(@PathVariable Long userId) {
 
         User user = userService.retrieveUser(userId)
@@ -62,6 +68,7 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseBody
     public ResponseEntity<?> createNewUser(@RequestBody User newUser, @RequestBody Long roleId) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
@@ -78,6 +85,7 @@ public class UserController {
       }
 
     @PutMapping("/{userId}")
+    @ResponseBody
     ResponseEntity<?> replaceUser(@RequestBody User newUser, @RequestBody Long roleId, @PathVariable Long userId) throws URISyntaxException {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
@@ -113,6 +121,7 @@ public class UserController {
 
 
     @DeleteMapping("/{userId}")
+    @ResponseBody
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
             if (userService.retrieveUser(userId).isPresent()) {
@@ -136,10 +145,19 @@ public class UserController {
         return "registration";
     }
 
+//    @RequestMapping(value="/registration", method = RequestMethod.GET)
+//    public ModelAndView registration(ModelAndView modelAndView){
+////        ModelAndView modelAndView = new ModelAndView();
+//        User user = new User();
+//        modelAndView.addObject("user", user);
+//        modelAndView.setViewName("registration");
+//        return modelAndView;
+//    }
+
     @PostMapping("/registration")
     public String registration(@ModelAttribute("userForm") User userForm, @ModelAttribute("roleId") Long roleId, BindingResult bindingResult) { //diff w tutorial
         userValidator.validate(userForm, bindingResult);
-//        userValidator.validate(roleId, bindingResult);
+        userValidator.validate(roleId, bindingResult);
 
         if (bindingResult.hasErrors()) {
             return "registration";
@@ -151,14 +169,25 @@ public class UserController {
         return "redirect:/welcome";
     }
 
+//    @GetMapping("/login")
+//    public String login(Model model, String error, String logout) {
+//        if (error != null)
+//            model.addAttribute("error", "Your username and/or password is invalid.");
+//
+//        if (logout != null)
+//            model.addAttribute("message", "You have been logged out successfully.");
+//
+//        return "login";
+//
+////        public ModelAndView login(){
+////            ModelAndView modelAndView = new ModelAndView();
+////            modelAndView.setViewName("login");
+////            return modelAndView;
+//    }
+
     @GetMapping("/login")
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your username and/or password is invalid.");
-
-        if (logout != null)
-            model.addAttribute("message", "You have been logged out successfully.");
-
+    public String login(Map<String, Object> model) {
+        model.put("message", "HowToDoInJava Reader !!");
         return "login";
     }
 
