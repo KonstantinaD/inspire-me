@@ -1,12 +1,12 @@
 package com.inspireme.controller;
 
-import com.inspireme.validator.UserValidator;
 import com.inspireme.controller.assemblers.UserResourceAssembler;
 import com.inspireme.exception.UserNotFoundException;
 import com.inspireme.model.User;
 import com.inspireme.model.UserType;
 import com.inspireme.service.SecurityService;
 import com.inspireme.service.UserService;
+import com.inspireme.validator.UserValidator;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
@@ -16,12 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -82,7 +80,7 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType()));
-      }
+    }
 
     @PutMapping("/{userId}")
     @ResponseBody
@@ -108,9 +106,9 @@ public class UserController {
                         .body(userResource);
             }
 
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
         }
 
         return ResponseEntity
@@ -133,9 +131,9 @@ public class UserController {
                     .status(HttpStatus.NOT_FOUND)
                     .body(new VndErrors.VndError("User Not Found", "You can't delete the user with user id " + userId + ". This user doesn't exist."));
         }
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
     }
 
     @GetMapping("/registration")
@@ -169,15 +167,16 @@ public class UserController {
         return "redirect:/welcome";
     }
 
-//    @GetMapping("/login")
-//    public String login(Model model, String error, String logout) {
-//        if (error != null)
-//            model.addAttribute("error", "Your username and/or password is invalid.");
-//
-//        if (logout != null)
-//            model.addAttribute("message", "You have been logged out successfully.");
-//
-//        return "login";
+    @GetMapping("/login")
+    public String login(Model model, String error, String logout) {
+        if (error != null)
+            model.addAttribute("error", "Your username and/or password is invalid.");
+
+        if (logout != null)
+            model.addAttribute("message", "You have been logged out successfully.");
+
+        return "login";
+    }
 //
 ////        public ModelAndView login(){
 ////            ModelAndView modelAndView = new ModelAndView();
@@ -185,17 +184,18 @@ public class UserController {
 ////            return modelAndView;
 //    }
 
-    @GetMapping("/login")
-    public String login(Map<String, Object> model) {
-        model.put("message", "HowToDoInJava Reader !!");
-        return "login";
+//    @GetMapping("/login")
+//    public String login(Map<String, Object> model) {
+//        model.put("message", "HowToDoInJava Reader !!");
+//        return "login";
+//    }
+
+        @GetMapping({"/", "/welcome"})
+        public String welcome (Model model){
+            return "welcome";
+        }
     }
 
-    @GetMapping({"/", "/welcome"})
-    public String welcome(Model model) {
-        return "welcome";
-    }
-}
 
 
 
