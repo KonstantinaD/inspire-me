@@ -1,9 +1,7 @@
 package com.inspireme.controller.converters;
 
-import com.inspireme.model.Article;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ObjectToIdConverterTest {

@@ -6,11 +6,10 @@ import com.inspireme.model.Tag;
 import com.inspireme.repository.ArticleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static jdk.nashorn.internal.objects.NativeMath.max;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {

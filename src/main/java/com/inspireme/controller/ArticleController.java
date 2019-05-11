@@ -2,6 +2,7 @@ package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.ArticleResourceAssembler;
 import com.inspireme.exception.ArticleNotFoundException;
+import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
 import com.inspireme.model.Tag;
@@ -10,16 +11,12 @@ import com.inspireme.service.TagService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
-import org.springframework.hateoas.core.EmbeddedWrapper;
-import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -166,13 +163,32 @@ public class ArticleController {
         return ResponseEntity.noContent().build();
     }
 
-//    @DeleteMapping("/{article}/{tag}")
-//    public void deleteTagFromArticle(@PathVariable Article article, @PathVariable Tag tag) {
-//
-//        tagService.deleteTagPerArticle(article, tag);
-//
-//        //return ResponseEntity.noContent().build();
-//    }
+
+    @PostMapping("/{article}/tags")
+    public ResponseEntity addTagsToArticle(@PathVariable Article article, @RequestBody List<Long> tagIds) throws URISyntaxException {
+
+        for(Long tagId : tagIds){
+            tagService.retrieveTag(tagId)
+                    .map(tag -> article.getTags().add(tag))
+                    .orElseThrow(() -> new TagNotFoundException(tagId));
+        }
+        articleService.saveArticle(article);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{article}/tags/{tag}")
+    public ResponseEntity deleteTagFromArticle(@PathVariable Article article, @PathVariable Tag tag) {
+
+        boolean deleted = article.getTags().remove(tag);
+
+        if (!deleted){
+            throw new TagNotFoundException(tag.getTagId());
+        }
+
+        articleService.saveArticle(article);
+
+        return ResponseEntity.noContent().build();
+    }
 }
 
 //    /* The Article object built from the save() operation is then turned into its resource-based version - wrapped using the ArticleResourceAssembler into a Resource<Article> object

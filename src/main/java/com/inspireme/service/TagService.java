@@ -1,7 +1,6 @@
 package com.inspireme.service;
 
 import com.inspireme.model.Article;
-import com.inspireme.model.Comment;
 import com.inspireme.model.Tag;
 
 import java.util.List;
