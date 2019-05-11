@@ -20,7 +20,7 @@
         <h2 class="form-heading">Log In</h2>
         <div class="form-group ${error != null ? 'has-error' : ''}">
             <span>${message}</span>
-            <input name="userName" type="text" class="form-control" placeholder="Enter your username"
+            <input name="username" type="text" class="form-control" placeholder="Enter your username"
                    autofocus="true"/>
             <input name="password" type="password" class="form-control" placeholder="Enter your password"/>
             <span>${error}</span>

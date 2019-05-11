@@ -12,7 +12,7 @@ public interface UserService {
 
     List<User> retrieveAllUsers();
 
-    User saveUser(User user, Long roleId);
+    User saveUser(User user);
 
     void deleteUser(Long userId);
 

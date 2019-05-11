@@ -54,10 +54,10 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createNewUser(@RequestBody User newUser, @RequestBody Long roleId) throws URISyntaxException {
+    public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
         if (newUser.getUserType() == UserType.VISITOR) {
 
-            Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser, roleId)); //diff with tutorial
+            Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser)); //diff with tutorial
 
             return ResponseEntity
                     .created(new URI(userResource.getId().expand().getHref()))  //the italic is the http status
@@ -70,19 +70,17 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    ResponseEntity<?> replaceUser(@RequestBody User newUser, @RequestBody Long roleId, @PathVariable Long userId) throws URISyntaxException {
+    ResponseEntity<?> replaceUser(@RequestBody User newUser,  @PathVariable Long userId) throws URISyntaxException {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
 
                 User updatedUser = userService.retrieveUser(userId)
                         .map(user -> {
                             user.setUserName(newUser.getUserName());
-                            user.setUserType(newUser.getUserType());
-                            user.setRole(newUser.getRole());
-                            return userService.saveUser(user, roleId); //?
+                            return userService.saveUser(user); //?
                         })
                         .orElseGet(() -> {
-                            return userService.saveUser(newUser, roleId);  //?
+                            return userService.saveUser(newUser);  //?
                         });
 
                 Resource<User> userResource = userAssembler.toResource(updatedUser);

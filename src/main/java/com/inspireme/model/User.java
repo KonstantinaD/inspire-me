@@ -35,10 +35,6 @@ public class User {
     @ToString.Exclude
     private String passwordConfirm;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @ToString.Exclude
-    private Role role;    //difference with tutorial
-
     @OneToMany(mappedBy = "articlePublishedBy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JsonBackReference
     @ToString.Exclude

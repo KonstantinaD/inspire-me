@@ -38,8 +38,8 @@ public class ViewController {
         if (bindingResult.hasErrors()) {
             return "registration";
         }
-        userService.saveUser(userForm, null);
 
+        userService.saveUser(userForm);
         securityService.autoLogin(userForm.getUserName(), userForm.getPasswordConfirm());
 
         return "redirect:/welcome";

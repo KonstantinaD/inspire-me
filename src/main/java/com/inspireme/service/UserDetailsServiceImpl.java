@@ -17,7 +17,7 @@ import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    //@Autowired
+
     private final UserRepository userRepository;
 
     public UserDetailsServiceImpl(UserRepository userRepository) {   //diff with tutorial, where it's Autowired only
@@ -31,9 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) throw new UsernameNotFoundException(userName);
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        //for (Role role : user.getRoles()){
-            grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
-        //}
+        grantedAuthorities.add(new SimpleGrantedAuthority(user.getUserType().name()));
 
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), grantedAuthorities);
     }

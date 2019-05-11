@@ -37,28 +37,4 @@ public class WebConfig implements WebMvcConfigurer {
             throw new RuntimeException(ex);
         }
     }
-
-//    @Override
-//    public void configureViewResolvers(ViewResolverRegistry registry) {
-//        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-//        resolver.setPrefix("/WEB-INF/view/");
-//        resolver.setSuffix(".jsp");
-//        resolver.setViewClass(JstlView.class);
-//        registry.viewResolver(resolver);
-//    }
-
-//    @Bean
-//    public ViewResolver internalResourceViewResolver() {
-//        InternalResourceViewResolver bean = new InternalResourceViewResolver();
-//        bean.setViewClass(JstlView.class);
-//        bean.setPrefix("/WEB-INF/view/");
-//        bean.setSuffix(".jsp");
-//        return bean;
-//    }
-
-//    @Override //works for html only views
-//    public void configureDefaultServletHandling(
-//            DefaultServletHandlerConfigurer configurer) {
-//        configurer.enable();
-//    }
 }
