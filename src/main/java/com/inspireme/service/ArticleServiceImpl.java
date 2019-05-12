@@ -11,9 +11,9 @@ import com.inspireme.repository.CategoryRepository;
 import com.inspireme.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -23,6 +23,9 @@ public class ArticleServiceImpl implements ArticleService {
     private final TagRepository tagRepository;
 
     private final int MAX_RELATED_ARTICLES = 4;
+
+    private final long CATEGORY_WEIGHT = 2;
+    private final long TAG_WEIGHT = 1;
 
     public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository) {
         this.articleRepository = articleRepository;
@@ -88,64 +91,33 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article targetArticle = retrieveArticle(targetArticleId);
 
-        Category targetCategory = targetArticle.getCategory();
+        Comparator<Article> weightComparator = Comparator
+                .comparing(article -> calculateRelevanceWeight(targetArticle, article),  Comparator.reverseOrder());
+        Comparator<Article> datePublishedComparator = Comparator
+                .comparing(Article::getDateArticlePublished, Comparator.reverseOrder());
 
-        List<Article> articlesInSameCategory = retrieveAllArticlesPerCategory(targetCategory.getCategoryId())
-            .stream()
-            .filter(article -> !article.equals(targetArticle))
-            .limit(MAX_RELATED_ARTICLES)
-            .collect(Collectors.toList());
-
-        if(articlesInSameCategory.size() < MAX_RELATED_ARTICLES){
-
-            return Stream.concat(
-                    articlesInSameCategory.stream(),
-                    retrieveAllArticles().stream()
-                            .filter(article -> !article.getCategory().equals(targetCategory))
-                            .limit(MAX_RELATED_ARTICLES - articlesInSameCategory.size())
-            ).collect(Collectors.toList());
-        }
-
-        return articlesInSameCategory;
+       return retrieveAllArticles().stream()
+                .filter(article -> !article.equals(targetArticle))
+                .sorted(weightComparator.thenComparing(datePublishedComparator))
+                .limit(MAX_RELATED_ARTICLES)
+                .collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<Article> retrieveRelatedArticlesByTags(Long targetArticleId) {
-//
-//        Optional<Article> targetArticle = retrieveArticle(targetArticleId);
-//
-//        Set<Tag> targetTags = targetArticle.get().getTags();
-//
-//        List<Article> articlesWithCommonTags1 = new ArrayList<Article>();
-//
-//        int numberOfCommonTags = 0;
-//
-//        for (Tag tag : targetTags) {
-//
-//            List<Article> articlesWithCommonTags = retrieveAllArticlesPerTag(tag)  //all articles which have this tag (excluding the current article)
-//                    .stream()
-//                    .filter(article -> !article.equals(targetArticle.get()))
-//                    .collect(Collectors.toList());
-//
-//            for (Article article : articlesWithCommonTags) {
-//                numberOfCommonTags = 1;
-//                articlesWithCommonTags1.add(article);
-//                Set<Tag> otherTagsOfArticleWithCommonTags = article.getTags()
-//                        .stream()
-//                        .filter(otherTag -> !otherTag.equals(tag))
-//                        .collect(Collectors.toSet());
-//
-//                    for (Tag tag1 : otherTagsOfArticleWithCommonTags) {
-//                        if (targetTags.contains(tag1)) {
-//                        numberOfCommonTags =  numberOfCommonTags + 1;
-//                        }
-//                    }
-//                }
-//            }
-//        return articlesWithCommonTags1
-//                .stream()
-//                .sorted(Comparator.comparingInt(max(numberOfCommonTags));
-//
-//
-//        }
+    private long calculateRelevanceWeight(Article currentArticle, Article relatedArticle){
+        long relevanceWeight = 0;
+
+        if (currentArticle.getCategory().equals(relatedArticle.getCategory())){
+            relevanceWeight += CATEGORY_WEIGHT;
+        }
+
+        long commonTags = currentArticle.getTags().stream()
+                .filter(tag -> relatedArticle.getTags().contains(tag))
+                .count();
+
+        relevanceWeight += (commonTags * TAG_WEIGHT);
+
+        return relevanceWeight;
+    }
 }
+
+
