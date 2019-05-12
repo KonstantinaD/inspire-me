@@ -1,7 +1,7 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.CommentResourceAssembler;
-import com.inspireme.exception.CommentNotFoundException;
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 import com.inspireme.service.CommentService;
@@ -62,7 +62,7 @@ public class CommentController {
     public Resource<Comment> getComment(@PathVariable Long commentId) {
 
         Comment comment = commentService.retrieveComment(commentId)
-                .orElseThrow(() -> new CommentNotFoundException(commentId));
+                .orElseThrow(() -> new NotFoundException(commentId, Comment.class));
 
         return commentAssembler.toResource(comment);
     }

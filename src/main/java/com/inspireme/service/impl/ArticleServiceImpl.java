@@ -1,14 +1,12 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
-import com.inspireme.exception.ArticleNotFoundException;
-import com.inspireme.exception.CategoryNotFoundException;
-import com.inspireme.exception.TagNotFoundException;
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
-import com.inspireme.model.Tag;
 import com.inspireme.repository.ArticleRepository;
 import com.inspireme.repository.CategoryRepository;
-import com.inspireme.repository.TagRepository;
+import com.inspireme.service.ArticleService;
+import com.inspireme.service.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -20,24 +18,25 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
-    private final TagRepository tagRepository;
 
-    private final int MAX_RELATED_ARTICLES = 4;
+    private final TagService tagService;
 
-    private final long CATEGORY_WEIGHT = 2;
-    private final long TAG_WEIGHT = 1;
+    private final static int MAX_RELATED_ARTICLES = 4;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository) {
+    private final static long CATEGORY_WEIGHT = 2;
+    private final static long TAG_WEIGHT = 1;
+
+    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagService tagService) {
         this.articleRepository = articleRepository;
         this.categoryRepository = categoryRepository;
-        this.tagRepository = tagRepository;
+        this.tagService = tagService;
     }
 
     @Override
     public Article retrieveArticle(Long articleId) {
 
         return articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFoundException(articleId));
+                .orElseThrow(() -> new NotFoundException(articleId, Article.class));
     }
 
     @Override
@@ -64,16 +63,14 @@ public class ArticleServiceImpl implements ArticleService {
     public List<Article> retrieveAllArticlesPerCategory(Long categoryId) {
 
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                .orElseThrow(() -> new NotFoundException(categoryId, Category.class));
 
         return articleRepository.findByCategory(category);
     }
 
     @Override
     public List<Article> retrieveAllArticlesPerTag(Long tagId) {
-        Tag tag = tagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
-
-        return articleRepository.findByTags(tag);
+        return articleRepository.findByTag(tagService.retrieveTag(tagId));
     }
 
     @Override
@@ -82,8 +79,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void deleteArticle(Article article) {
-        articleRepository.delete(article);
+    public void deleteArticle(Long articleId) {
+        articleRepository.delete(retrieveArticle(articleId));
     }
 
     @Override

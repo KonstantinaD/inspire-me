@@ -1,5 +1,6 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
+import com.inspireme.service.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;

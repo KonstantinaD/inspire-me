@@ -1,7 +1,6 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.UserResourceAssembler;
-import com.inspireme.exception.UserNotFoundException;
 import com.inspireme.model.User;
 import com.inspireme.model.UserType;
 import com.inspireme.service.UserService;
@@ -47,9 +46,7 @@ public class UserController {
     @GetMapping("/{userId}")
     public Resource<User> getUser(@PathVariable Long userId) {
 
-        User user = userService.retrieveUser(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-
+        User user = userService.retrieveUser(userId);
         return userAssembler.toResource(user);
     }
 
@@ -74,15 +71,7 @@ public class UserController {
         if (userId != 1) {
             if (newUser.getUserType() == UserType.VISITOR) {
 
-                User updatedUser = userService.retrieveUser(userId)
-                        .map(user -> {
-                            user.setUserName(newUser.getUserName());
-                            return userService.saveUser(user); //?
-                        })
-                        .orElseGet(() -> {
-                            return userService.saveUser(newUser);  //?
-                        });
-
+                User updatedUser = userService.replaceUser(userId, newUser);
                 Resource<User> userResource = userAssembler.toResource(updatedUser);
 
                 return ResponseEntity
@@ -105,14 +94,8 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         if (userId != 1) {
-            if (userService.retrieveUser(userId).isPresent()) {
-                userService.deleteUser(userId);
-
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new VndErrors.VndError("User Not Found", "You can't delete the user with user id " + userId + ". This user doesn't exist."));
+            userService.deleteUser(userId);
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)

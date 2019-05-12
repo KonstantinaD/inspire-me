@@ -17,6 +17,6 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findFromOtherCategories(@Param("category") Category category);
 
     @Query("SELECT a FROM Article a WHERE :tag MEMBER OF a.tags")
-    List<Article> findByTags(@Param("tag") Tag tag);
+    List<Article> findByTag(@Param("tag") Tag tag);
 }
 

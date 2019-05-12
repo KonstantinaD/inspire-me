@@ -1,13 +1,14 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.User;
 import com.inspireme.model.UserType;
 import com.inspireme.repository.UserRepository;
+import com.inspireme.service.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,8 +23,8 @@ public class UserServiceImpl implements UserService {
    }
 
     @Override
-    public Optional<User> retrieveUser(Long userId) {
-        return userRepository.findById(userId);
+    public User retrieveUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(userId, User.class));
     }
 
     @Override
@@ -39,8 +40,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser (Long userId) {
-       userRepository.deleteById(userId);
+    public void deleteUser(Long userId) {
+        userRepository.delete(retrieveUser(userId));
     }
 
     @Override
@@ -48,5 +49,15 @@ public class UserServiceImpl implements UserService {
        return userRepository.findByUserName(userName);
     }
 
+    @Override
+    public User replaceUser(Long articleId, User newUser) {
+
+        User updateUser = userRepository.findById(articleId)
+                .orElseGet(User::new);
+
+        updateUser.setUserName(newUser.getUserName());
+
+        return saveUser(updateUser);
+    }
 
 }

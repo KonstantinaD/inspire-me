@@ -3,6 +3,7 @@ package com.inspireme.service;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
 import com.inspireme.repository.ArticleRepository;
+import com.inspireme.service.impl.ArticleServiceImpl;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;

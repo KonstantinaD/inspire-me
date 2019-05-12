@@ -1,7 +1,7 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.ArticleResourceAssembler;
-import com.inspireme.exception.TagNotFoundException;
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 import com.inspireme.service.ArticleService;
@@ -154,10 +154,10 @@ public class ArticleController {
     }
 
     //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
-    @DeleteMapping("/{article}")
-    public ResponseEntity<?> deleteArticle(@PathVariable Article article) {
+    @DeleteMapping("/{articleId}")
+    public ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
 
-        articleService.deleteArticle(article);
+        articleService.deleteArticle(articleId);
 
         return ResponseEntity.noContent().build();
     }
@@ -166,12 +166,12 @@ public class ArticleController {
     @PostMapping("/{article}/tags")
     public ResponseEntity addTagsToArticle(@PathVariable Article article, @RequestBody List<Long> tagIds) throws URISyntaxException {
 
-        for(Long tagId : tagIds){
-            tagService.retrieveTag(tagId)
-                    .map(tag -> article.getTags().add(tag))
-                    .orElseThrow(() -> new TagNotFoundException(tagId));
-        }
+        tagIds.stream()
+                .map(tagService::retrieveTag)
+                .forEach(tag -> article.getTags().add(tag));
+
         articleService.saveArticle(article);
+
         return ResponseEntity.ok().build();
     }
 
@@ -181,7 +181,7 @@ public class ArticleController {
         boolean deleted = article.getTags().remove(tag);
 
         if (!deleted){
-            throw new TagNotFoundException(tag.getTagId());
+            throw new NotFoundException(tag.getTagId(), Tag.class);
         }
 
         articleService.saveArticle(article);

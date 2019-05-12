@@ -1,4 +1,4 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
 import com.inspireme.model.User;
 import com.inspireme.repository.UserRepository;

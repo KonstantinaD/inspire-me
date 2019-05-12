@@ -1,10 +1,8 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.TagResourceAssembler;
-import com.inspireme.exception.TagNotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
-import com.inspireme.service.ArticleService;
 import com.inspireme.service.TagService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -25,12 +23,10 @@ public class TagController {
 
     private final TagService tagService;
     private final TagResourceAssembler tagAssembler;
-    private final ArticleService articleService;
 
-    public TagController(TagService tagService, TagResourceAssembler tagAssembler, ArticleService articleService) {
+    public TagController(TagService tagService, TagResourceAssembler tagAssembler) {
         this.tagService = tagService;
         this.tagAssembler = tagAssembler;
-        this.articleService = articleService;
     }
 
     @GetMapping
@@ -66,8 +62,7 @@ public class TagController {
     @GetMapping("/{tagId}")
     public Resource<Tag> getTag(@PathVariable Long tagId) {
 
-        Tag tag = tagService.retrieveTag(tagId)
-                .orElseThrow(() -> new TagNotFoundException(tagId));
+        Tag tag = tagService.retrieveTag(tagId);
 
         return new Resource<>(tag,
                 linkTo(methodOn(TagController.class).getTag(tag.getTagId())).withSelfRel(),

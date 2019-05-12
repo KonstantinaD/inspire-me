@@ -1,8 +1,9 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
 import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 import com.inspireme.repository.CommentRepository;
+import com.inspireme.service.CommentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

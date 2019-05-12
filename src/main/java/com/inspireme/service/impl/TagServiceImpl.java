@@ -1,15 +1,16 @@
-package com.inspireme.service;
+package com.inspireme.service.impl;
 
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 import com.inspireme.repository.TagRepository;
+import com.inspireme.service.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class TagServiceImpl implements TagService{
+public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
 
@@ -18,8 +19,8 @@ public class TagServiceImpl implements TagService{
     }
 
     @Override
-    public Optional<Tag> retrieveTag(Long tagId) {
-        return tagRepository.findById(tagId);
+    public Tag retrieveTag(Long tagId) {
+        return tagRepository.findById(tagId).orElseThrow(() -> new NotFoundException(tagId, Tag.class));
     }
 
     @Override
