@@ -8,7 +8,7 @@ public interface ArticleService {
 
     Article retrieveArticle(Long articleId);
 
-    Article replaceArticle(Long articleId, Article newArticle);
+    Article updateArticle(Long articleId, Article newArticle);
 
     List<Article> retrieveAllArticles();
 

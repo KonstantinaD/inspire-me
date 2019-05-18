@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -21,7 +23,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @NotEmpty(message = "Please provide a username")
     private String userName;
+
+    @ToString.Exclude
+    @NotEmpty(message = "Please provide an email address")
+    @Email
+    private String emailAddress;
 
     private UserType userType;
 

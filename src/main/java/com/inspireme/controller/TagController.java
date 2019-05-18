@@ -29,6 +29,17 @@ public class TagController {
         this.tagAssembler = tagAssembler;
     }
 
+    @GetMapping("/{tagId}")
+    public Resource<Tag> getTag(@PathVariable Long tagId) {
+
+        Tag tag = tagService.retrieveTag(tagId);
+                //.orElseThrow(() -> new TagNotFoundException(tagId));
+
+        return new Resource<>(tag,
+                linkTo(methodOn(TagController.class).getTag(tagId)).withSelfRel(),
+                linkTo(methodOn(TagController.class).getAllTags()).withRel("tags"));
+    }
+
     @GetMapping
     public Resources<Resource<Tag>> getAllTags() {
         if (!tagService.retrieveAllTags().isEmpty()) {
@@ -58,33 +69,6 @@ public class TagController {
 
         return null;
     }
-
-    @GetMapping("/{tagId}")
-    public Resource<Tag> getTag(@PathVariable Long tagId) {
-
-        Tag tag = tagService.retrieveTag(tagId);
-
-        return new Resource<>(tag,
-                linkTo(methodOn(TagController.class).getTag(tag.getTagId())).withSelfRel(),
-                linkTo(methodOn(TagController.class).getAllTags()).withRel("tags"));
-    }
-
-//    @DeleteMapping("/{tag}")
-//    public ResponseEntity<?> deleteTagFromArticle(@PathVariable Tag tag, @RequestBody Set<Article> articles) {
-//        if (tagService.retrieveTag(tag.getTagId()/*tagId*/).isPresent()) {
-//            //List<Article> articlesWithTag = articleService.retrieveAllArticlesPerTag(tagService.retrieveTag(tagId).get());
-//            for (Article article : articles/*articlesWithTag*//*tag.getArticles()*/) {
-//                //Article articleToLoseTag = articles.//articleService.retrieveArticle(article.getArticleId()).get();
-//                article /*ToLoseTag*/.getTags().remove(tag);//(tagService.retrieveTag(tagId));
-//                articleService.saveArticle(article /*ToLoseTag*/);
-//            }
-//            return null;
-//        }
-//
-//        return ResponseEntity
-//                .status(HttpStatus.NOT_FOUND)
-//                .body(new VndErrors.VndError("Tag Not Found", "The tag with tag id " + tag.getTagId() + " doesn't exist."));
-//    }
 }
 
 

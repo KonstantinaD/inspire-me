@@ -40,10 +40,10 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article replaceArticle(Long articleId, Article newArticle) {
+    public Article updateArticle(Long articleId, Article newArticle) {
 
         Article updatedArticle = articleRepository.findById(articleId)
-                .orElseGet(Article::new);
+                .orElseThrow(() -> new NotFoundException(articleId, Article.class));
 
         updatedArticle.setArticleTitle(newArticle.getArticleTitle());
         updatedArticle.setArticleText(newArticle.getArticleText());
@@ -100,14 +100,14 @@ public class ArticleServiceImpl implements ArticleService {
                 .collect(Collectors.toList());
     }
 
-    private long calculateRelevanceWeight(Article currentArticle, Article relatedArticle){
+    private long calculateRelevanceWeight(Article targetArticle, Article relatedArticle){
         long relevanceWeight = 0;
 
-        if (currentArticle.getCategory().equals(relatedArticle.getCategory())){
+        if (targetArticle.getCategory().equals(relatedArticle.getCategory())){
             relevanceWeight += CATEGORY_WEIGHT;
         }
 
-        long commonTags = currentArticle.getTags().stream()
+        long commonTags = targetArticle.getTags().stream()
                 .filter(tag -> relatedArticle.getTags().contains(tag))
                 .count();
 

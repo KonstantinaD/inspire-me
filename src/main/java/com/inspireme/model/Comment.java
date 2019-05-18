@@ -7,11 +7,12 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-//@ToString(of = {"commentId", "dateCommentPublished"})
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "commentId", scope = Comment.class, resolver = EntityIdResolver.class)
 public class Comment {
     @Id
@@ -19,6 +20,7 @@ public class Comment {
     private Long commentId;
 
     @ToString.Exclude
+    @NotEmpty(message = "Please provide text for the comment")
     private String commentText;
 
     @ToString.Exclude
@@ -27,10 +29,12 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
     @ToString.Exclude
+    @NotEmpty(message = "Please provide an article id")
     private Article article;
 
     @ManyToOne
     @JoinColumn
     @ToString.Exclude
+    @NotNull(message = "Please provide a publisher")
     private User commentPublishedBy;
 }

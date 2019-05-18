@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 public class NotFoundAdvice {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleArticleNotFoundException(NotFoundException e) {
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(NotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(getBody(("Couldn't find ["+ e.getEntity() + "] with id " + e.getId())));
+                .body(getBody(("Couldn't find "+ e.getEntity() + " with id " + e.getId())));
     }
 
     @ExceptionHandler(UnresolvedForwardReference.class)

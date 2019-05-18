@@ -25,12 +25,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-/*To wrap your repository with a web layer, you must turn to Spring MVC
-An ArticleRepository is injected by constructor into the controller.
-All the controller methods return one of Spring HATEOAS’s ResourceSupport subclasses to properly render hypermedia (or an wrapper around such a type).
-*/
-
-@RestController  //RestController indicates that the data returned by each method will be written straight into the response body instead of rendering a view template (view model).
+@RestController
 @RequestMapping(path = "/articles")
 public class ArticleController {
 
@@ -39,34 +34,33 @@ public class ArticleController {
     private final TagService tagService;
 
     public ArticleController(ArticleService articleService,
-                      ArticleResourceAssembler articleAssembler, TagService tagService) {
+                             ArticleResourceAssembler articleAssembler, TagService tagService) {
         this.articleService = articleService;
         this.articleAssembler = articleAssembler;
         this.tagService = tagService;
     }
 
     @GetMapping
-    public Resources<Resource<Article>> getAllArticles() {
+    public Resources<?> getAllArticles() {
 
-        if (!articleService.retrieveAllArticles().isEmpty()) {
-            List<Resource<Article>> articles = articleService.retrieveAllArticles().stream()
+        List<Article> articles = articleService.retrieveAllArticles();
+
+        if (!articles.isEmpty()) {
+            List<Resource<Article>> articleResources = articles.stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
 
-            return new Resources<>(articles,
+            return new Resources<>(articleResources,
                     linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
         }
 
-//        EmbeddedWrappers wrappers = new EmbeddedWrappers(false);
-//        EmbeddedWrapper wrapper = wrappers.emptyCollectionOf(Article.class);
-//        Resources<Resource<Article>> resources = new Resources<>(Arrays.asList(wrapper));
-//        return resources;
-
-        return null;
+        return new Resources<>(Arrays.asList(getEmptyListArticleWrapper()),
+                linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
     }
 
     @GetMapping("/category/{categoryId}")
     public Resources<?> getArticlesByCategory(@PathVariable Long categoryId) {
+
         List<Article> articles = articleService.retrieveAllArticlesPerCategory(categoryId);
 
         if (!articles.isEmpty()) {
@@ -86,6 +80,7 @@ public class ArticleController {
     public Resources<?> getArticlesByTag(@PathVariable Long tagId) {
 
         List<Article> articles = articleService.retrieveAllArticlesPerTag(tagId);
+
         if (!articles.isEmpty()) {
             List<Resource<Article>> articleResources = articles.stream()
                     .map(articleAssembler::toResource)
@@ -100,9 +95,10 @@ public class ArticleController {
     }
 
     @GetMapping("/relatedArticles/{articleId}")
-      public Resources<?> getRelatedArticles(@PathVariable Long articleId) {
+    public Resources<?> getRelatedArticles(@PathVariable Long articleId) {
 
         List<Article> relatedArticles = articleService.retrieveRelatedArticles(articleId);
+
         if (!relatedArticles.isEmpty()) {
             List<Resource<Article>> relatedArticleResources = relatedArticles.stream()
                     .map(articleAssembler::toResource)
@@ -139,19 +135,21 @@ public class ArticleController {
     }
 
     @PutMapping("/{articleId}")
-    public ResponseEntity<?> replaceArticle(@RequestBody Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
+    public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
 
-        Article updatedArticle = articleService.replaceArticle(articleId, newArticle);
+//        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //PERMISSIONS - secure endpoint better
+        Article updatedArticle = articleService.updateArticle(articleId, newArticle);
         Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
 
         return ResponseEntity
-                .created(new URI(articleResource.getId().expand().getHref()))
-                .body(articleResource);
-
+                    .created(new URI(articleResource.getId().expand().getHref()))
+                    .body(articleResource);
+        }
 //        return ResponseEntity
 //                .status(HttpStatus.FORBIDDEN)
 //                .body(new VndErrors.VndError("Article Manipulator Not Allowed", "An article can't be edited or published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can edit or publish articles."));
-    }
+//    }
+
 
     //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
     @DeleteMapping("/{articleId}")
@@ -163,25 +161,31 @@ public class ArticleController {
     }
 
 
-    @PostMapping("/{article}/tags")
-    public ResponseEntity addTagsToArticle(@PathVariable Article article, @RequestBody List<Long> tagIds) throws URISyntaxException {
+    @PostMapping("/{articleId}/tags/{tagId}")
+    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @PathVariable/*@RequestBody /*List<*/Long/*>*/ tagId) throws URISyntaxException {
 
-        tagIds.stream()
-                .map(tagService::retrieveTag)
-                .forEach(tag -> article.getTags().add(tag));
+        Article article = articleService.retrieveArticle(articleId);
+
+//        tagIds.stream()    //add list of tags - DECIDE
+//                .map(tagService::retrieveTag)
+//                .forEach(tag -> article.getTags().add(tag));
+
+        article.getTags().add(tagService.retrieveTag(tagId));
 
         articleService.saveArticle(article);
 
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{article}/tags/{tag}")
-    public ResponseEntity deleteTagFromArticle(@PathVariable Article article, @PathVariable Tag tag) {
+    @DeleteMapping("/{articleId}/tags/{tagId}")
+    public ResponseEntity deleteTagFromArticle(@PathVariable Long articleId, @PathVariable Long tagId) {
 
-        boolean deleted = article.getTags().remove(tag);
+        Article article = articleService.retrieveArticle(articleId);
 
-        if (!deleted){
-            throw new NotFoundException(tag.getTagId(), Tag.class);
+        boolean tagDeleted = article.getTags().remove(tagService.retrieveTag(tagId));
+
+        if (!tagDeleted){
+            throw new NotFoundException(tagId, Tag.class);
         }
 
         articleService.saveArticle(article);
@@ -194,10 +198,7 @@ public class ArticleController {
     }
 }
 
-//    /* The Article object built from the save() operation is then turned into its resource-based version - wrapped using the ArticleResourceAssembler into a Resource<Article> object
-//    * Since we want a more detailed HTTP response code than 200 OK, we will use Spring MVC’s ResponseEntity wrapper. It has a handy static method created() where we can plug in the resource’s URI.
-//     By grabbing the resource you can fetch it’s "self" link via the getId() method call. This method yields a Link which you can turn into a Java URI. To tie things up nicely, you inject the resource itself into the body() method.
-//     @RequestBody - the method parameter should be bound to the body of the web request.*/
+
 
 
 

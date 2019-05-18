@@ -4,6 +4,7 @@ import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TagService {
 
@@ -13,5 +14,7 @@ public interface TagService {
 
     List<Tag> retrieveAllTagsPerArticle(Article article);
 
-//    void deleteTagPerArticle(Article article, Tag tag);
+//    Tag saveTag(Tag tag);
+//
+//    void deleteTag (Long TagId);
 }
