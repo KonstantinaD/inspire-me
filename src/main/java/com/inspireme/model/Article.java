@@ -51,7 +51,7 @@ public class Article {
     @ManyToOne
     @JoinColumn
     @ToString.Exclude
-    @NotNull(message = "Please provide a publisher")
+    @NotNull(message = "Please provide an article publisher")
     private User articlePublishedBy;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

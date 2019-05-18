@@ -30,7 +30,7 @@ public class NotFoundAdvice {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(getBody(errorList));
+                .body(getBodyForList(errorList));
     }
 
     private String buildUnresolvedIdMessage(UnresolvedId unresolvedId){
@@ -38,10 +38,10 @@ public class NotFoundAdvice {
     }
 
     private Map<String, Object> getBody(String error){
-        return getBody(Collections.singletonList(error));
+        return getBodyForList(Collections.singletonList(error));
     }
     
-    private Map<String, Object> getBody(List<String> errors){
+    private Map<String, Object> getBodyForList(List<String> errors){
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", new Date());
         body.put("errors", errors);

@@ -7,11 +7,15 @@ import com.inspireme.model.Comment;
 import com.inspireme.service.CommentService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.core.EmbeddedWrapper;
+import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,79 +35,79 @@ public class CommentController {
     }
 
     @GetMapping
-    public Resources<Resource<Comment>> getAllComments() {
-        if (!commentService.retrieveAllComments().isEmpty()) {
-            List<Resource<Comment>> comments = commentService.retrieveAllComments().stream()
+    public Resources<?> getAllComments() {
+
+        List<Comment> comments = commentService.retrieveAllComments();
+
+        if (!comments.isEmpty()) {
+            List<Resource<Comment>> commentResources = comments.stream()
                     .map(commentAssembler::toResource)
                     .collect(Collectors.toList());
 
-            return new Resources<>(comments,
+            return new Resources<>(commentResources,
                     linkTo(methodOn(CommentController.class).getAllComments()).withSelfRel());
         }
 
-        return null;
+        return new Resources<>(Arrays.asList(getEmptyListCommentWrapper()),
+                linkTo(methodOn(CommentController.class).getAllComments()).withSelfRel());
     }
 
-    @GetMapping("/article/{article}")
-    public Resources<Resource<Comment>> getAllCommentsByArticle(@PathVariable Article article) {
-        if (!commentService.retrieveAllCommentsPerArticle(article).isEmpty()) {
-            List<Resource<Comment>> comments = commentService.retrieveAllCommentsPerArticle(article).stream()
+    @GetMapping("/article/{articleId}")
+    public Resources<?> getCommentsByArticle(@PathVariable Long articleId) {
+
+        List<Comment> comments = commentService.retrieveAllCommentsPerArticle(articleId);
+
+        if (!comments.isEmpty()) {
+            List<Resource<Comment>> commentResources = comments.stream()
                     .map(commentAssembler::toResource)
                     .collect(Collectors.toList());
 
-            return new Resources<>(comments,
-                    linkTo(methodOn(CommentController.class).getAllCommentsByArticle(article)).withSelfRel());
+            return new Resources<>(commentResources,
+                    linkTo(methodOn(CommentController.class).getCommentsByArticle(articleId)).withSelfRel());
         }
 
-        return null;
+        return new Resources<>(Arrays.asList(getEmptyListCommentWrapper()), linkTo(methodOn(CommentController.class).getCommentsByArticle(articleId)).withSelfRel());
     }
 
     @GetMapping("/{commentId}")
     public Resource<Comment> getComment(@PathVariable Long commentId) {
 
-        Comment comment = commentService.retrieveComment(commentId)
-                .orElseThrow(() -> new NotFoundException(commentId, Comment.class));
-
-        return commentAssembler.toResource(comment);
+        return commentAssembler.toResource(commentService.retrieveComment(commentId));
     }
 
     @PostMapping
-    public ResponseEntity<?> createNewComment(@RequestBody Comment newComment) throws URISyntaxException {
-        Resource<Comment> resource = commentAssembler.toResource(commentService.saveComment(newComment));
+    public ResponseEntity<?> createNewComment(@RequestBody @Valid Comment newComment) throws URISyntaxException {
+
+        Resource<Comment> commentResource = commentAssembler.toResource(commentService.saveComment(newComment));
 
         return ResponseEntity
-                .created(new URI(resource.getId().expand().getHref()))
-                .body(resource);
+                .created(new URI(commentResource.getId().expand().getHref()))
+                .body(commentResource);
     }
 
     //PERMISSIONS - ONLY THE PUBLISHER OF THE COMMENT CAN EDIT/DELETE IT, THE BELOW ONLY PREVENTS THE COMMENT PUBLISHER ID FROM CHANGING
     @PutMapping("/{commentId}")
-    public ResponseEntity<?> replaceComment(@RequestBody Comment newComment, @PathVariable Long commentId) throws URISyntaxException {
-            Comment updatedComment = commentService.retrieveComment(commentId)
-                    .map(comment -> {
-                        comment.setCommentText(newComment.getCommentText());
-                        comment.setArticle(newComment.getArticle());
-                        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated
-                        //comment.setCommentPublishedBy(newComment.getCommentPublishedBy());
-                        return commentService.saveComment(comment);
-                    })
-                    .orElseGet(() -> {
-                        return commentService.saveComment(newComment);
-                    });
+    public ResponseEntity<?> editComment(@RequestBody @Valid Comment newComment, @PathVariable Long commentId) throws URISyntaxException {
 
-            Resource<Comment> commentResource = commentAssembler.toResource(updatedComment);
+        Comment commentToUpdate = commentService.updateComment(newComment, commentId);
 
-            return ResponseEntity
+        Resource<Comment> commentResource = commentAssembler.toResource(commentToUpdate);
+
+        return ResponseEntity
                     .created(new URI(commentResource.getId().expand().getHref()))
                     .body(commentResource);
     }
 
     //WE NEED TO ENSURE THE COMMENT CAN BE DELETED ONLY BY THE PERSON WHO PUBLISHED IT(THE ADMIN SHOULD BE ABLE TO DELETE ALL COMMENTS) - PERMISSIONS
-    @DeleteMapping("/{comment}")
-    public ResponseEntity<?> deleteComment(@PathVariable Comment comment) {
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
 
-           commentService.deleteComment(comment);
+           commentService.deleteComment(commentId);
 
            return ResponseEntity.noContent().build();
+    }
+
+    private EmbeddedWrapper getEmptyListCommentWrapper(){
+        return new EmbeddedWrappers(false).emptyCollectionOf(Comment.class);
     }
 }

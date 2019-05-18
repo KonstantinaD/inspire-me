@@ -18,7 +18,7 @@ public class CommentResourceAssembler implements ResourceAssembler<Comment, Reso
 
         return new Resource<>(comment,
                 ControllerLinkBuilder.linkTo(methodOn(CommentController.class).getComment(comment.getCommentId())).withSelfRel(),
-                linkTo(methodOn(CommentController.class).getAllCommentsByArticle(comment.getArticle())).withRel("comments/article/{articleId}"),
+                linkTo(methodOn(CommentController.class).getCommentsByArticle(comment.getArticle().getArticleId())).withRel("comments/article/{articleId}"),
                 linkTo(methodOn(CommentController.class).getAllComments()).withRel("comments"));
     }
 }

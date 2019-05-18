@@ -1,7 +1,9 @@
 package com.inspireme.service.impl;
 
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
+import com.inspireme.repository.ArticleRepository;
 import com.inspireme.repository.CommentRepository;
 import com.inspireme.service.CommentService;
 import org.springframework.stereotype.Service;
@@ -13,14 +15,32 @@ import java.util.Optional;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
+    private final ArticleRepository articleRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, ArticleRepository articleRepository) {
         this.commentRepository = commentRepository;
+        this.articleRepository = articleRepository;
     }
 
     @Override
-    public Optional<Comment> retrieveComment(Long commentId) {
-        return commentRepository.findById(commentId);
+    public Comment retrieveComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(commentId, Comment.class));
+    }
+
+    @Override
+    public Comment updateComment(Comment newComment, Long commentId) {
+
+       Comment commentToUpdate = commentRepository.findById(commentId)
+               .orElseThrow(() -> new NotFoundException(commentId, Comment.class));
+
+        commentToUpdate.setCommentText(newComment.getCommentText());
+        //ON the UI they won't be able to move the comment to another article - the below is deactivated
+//        commentToUpdate.setArticle(newComment.getArticle());
+        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated - maybe better with PERMISSIONS
+//        commentToUpdate.setCommentPublishedBy(newComment.getCommentPublishedBy());
+
+        return saveComment(commentToUpdate);
     }
 
     @Override
@@ -29,7 +49,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> retrieveAllCommentsPerArticle(Article article) {
+    public List<Comment> retrieveAllCommentsPerArticle(Long articleId) {
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException(articleId, Article.class));
+
         return commentRepository.findByArticle(article);
     }
 
@@ -39,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Comment comment) {
-        commentRepository.delete(comment);
+    public void deleteComment(Long commentId) {
+        commentRepository.delete(retrieveComment(commentId));
     }
 }

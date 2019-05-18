@@ -29,12 +29,12 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
     @ToString.Exclude
-    @NotEmpty(message = "Please provide an article id")
+    @NotNull(message = "Please provide an article")
     private Article article;
 
     @ManyToOne
     @JoinColumn
     @ToString.Exclude
-    @NotNull(message = "Please provide a publisher")
+    @NotNull(message = "Please provide a comment publisher")
     private User commentPublishedBy;
 }

@@ -57,14 +57,14 @@ public class TagController {
     }
 
     @GetMapping("/article/{article}")
-    public Resources<Resource<Tag>> getAllTagsByArticle(@PathVariable Article article) {
+    public Resources<Resource<Tag>> getTagsByArticle(@PathVariable Article article) {
         if (!tagService.retrieveAllTagsPerArticle(article).isEmpty()) {
             List<Resource<Tag>> tags = tagService.retrieveAllTagsPerArticle(article).stream()
                     .map(tagAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(tags,
-                    linkTo(methodOn(TagController.class).getAllTagsByArticle(article)).withSelfRel());
+                    linkTo(methodOn(TagController.class).getTagsByArticle(article)).withSelfRel());
         }
 
         return null;

@@ -40,18 +40,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article updateArticle(Long articleId, Article newArticle) {
+    public Article updateArticle(Article newArticle, Long articleId) {
 
-        Article updatedArticle = articleRepository.findById(articleId)
+        Article articleToUpdate = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException(articleId, Article.class));
 
-        updatedArticle.setArticleTitle(newArticle.getArticleTitle());
-        updatedArticle.setArticleText(newArticle.getArticleText());
-        updatedArticle.setImageUrl(newArticle.getImageUrl());
-        updatedArticle.setCategory(newArticle.getCategory());
-        updatedArticle.setArticlePublishedBy(newArticle.getArticlePublishedBy());
+        articleToUpdate.setArticleTitle(newArticle.getArticleTitle());
+        articleToUpdate.setArticleText(newArticle.getArticleText());
+        articleToUpdate.setImageUrl(newArticle.getImageUrl());
+        articleToUpdate.setCategory(newArticle.getCategory());
+        articleToUpdate.setArticlePublishedBy(newArticle.getArticlePublishedBy());
 
-        return saveArticle(updatedArticle);
+        return saveArticle(articleToUpdate);
     }
 
     @Override
