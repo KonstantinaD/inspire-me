@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User retrieveUser(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(userId, User.class));
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(userId, User.class));
     }
 
     @Override
@@ -40,6 +41,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateUser(User newUser, Long userId) {
+
+        User userToUpdate = retrieveUser(userId);
+
+        userToUpdate.setUserName(newUser.getUserName());
+        userToUpdate.setEmailAddress(newUser.getEmailAddress());
+        userToUpdate.setPassword(newUser.getPassword());
+//what to do with passwordConfirm - not required on the model because it doesn't come encoded in the POST/PUT response
+
+        return saveUser(userToUpdate);
+    }
+
+    @Override
     public void deleteUser(Long userId) {
         userRepository.delete(retrieveUser(userId));
     }
@@ -48,16 +62,4 @@ public class UserServiceImpl implements UserService {
     public User retrieveUserByUserName(String userName) {
        return userRepository.findByUserName(userName);
     }
-
-    @Override
-    public User replaceUser(Long articleId, User newUser) {
-
-        User updateUser = userRepository.findById(articleId)
-                .orElseGet(User::new);
-
-        updateUser.setUserName(newUser.getUserName());
-
-        return saveUser(updateUser);
-    }
-
 }

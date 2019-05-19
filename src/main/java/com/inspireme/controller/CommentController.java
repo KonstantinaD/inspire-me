@@ -89,9 +89,9 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<?> editComment(@RequestBody @Valid Comment newComment, @PathVariable Long commentId) throws URISyntaxException {
 
-        Comment commentToUpdate = commentService.updateComment(newComment, commentId);
+        Comment updatedComment = commentService.updateComment(newComment, commentId);
 
-        Resource<Comment> commentResource = commentAssembler.toResource(commentToUpdate);
+        Resource<Comment> commentResource = commentAssembler.toResource(updatedComment);
 
         return ResponseEntity
                     .created(new URI(commentResource.getId().expand().getHref()))

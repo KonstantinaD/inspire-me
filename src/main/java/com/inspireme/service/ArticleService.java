@@ -8,8 +8,6 @@ public interface ArticleService {
 
     Article retrieveArticle(Long articleId);
 
-    Article updateArticle(Article newArticle, Long articleId);
-
     List<Article> retrieveAllArticles();
 
     List<Article> retrieveAllArticlesPerCategory(Long categoryId);
@@ -17,6 +15,8 @@ public interface ArticleService {
     List<Article> retrieveAllArticlesPerTag(Long tagId);
 
     Article saveArticle(Article article);
+
+    Article updateArticle(Article newArticle, Long articleId);
 
     void deleteArticle(Long articleId);
 

@@ -29,21 +29,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment updateComment(Comment newComment, Long commentId) {
-
-       Comment commentToUpdate = commentRepository.findById(commentId)
-               .orElseThrow(() -> new NotFoundException(commentId, Comment.class));
-
-        commentToUpdate.setCommentText(newComment.getCommentText());
-        //ON the UI they won't be able to move the comment to another article - the below is deactivated
-//        commentToUpdate.setArticle(newComment.getArticle());
-        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated - maybe better with PERMISSIONS
-//        commentToUpdate.setCommentPublishedBy(newComment.getCommentPublishedBy());
-
-        return saveComment(commentToUpdate);
-    }
-
-    @Override
     public List<Comment> retrieveAllComments() {
         return commentRepository.findAll();
     }
@@ -60,6 +45,20 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment saveComment(Comment comment) {
         return commentRepository.save(comment);
+    }
+
+    @Override
+    public Comment updateComment(Comment newComment, Long commentId) {
+
+        Comment commentToUpdate = retrieveComment(commentId);
+
+        commentToUpdate.setCommentText(newComment.getCommentText());
+        //ON the UI they won't be able to move the comment to another article - the below is deactivated
+//        commentToUpdate.setArticle(newComment.getArticle());
+        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated - maybe better with PERMISSIONS
+//        commentToUpdate.setCommentPublishedBy(newComment.getCommentPublishedBy());
+
+        return saveComment(commentToUpdate);
     }
 
     @Override

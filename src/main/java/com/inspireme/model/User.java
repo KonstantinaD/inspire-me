@@ -37,10 +37,12 @@ public class User {
     private LocalDateTime dateUserCreated = LocalDateTime.now();
 
     @ToString.Exclude
+    @NotEmpty(message = "Please provide a password")
     private String password;
 
     @Transient
     @ToString.Exclude
+//    @NotEmpty(message = "Please confirm your password")  this doesn't get encoded in the response body, look again at final implementation - creating users through controller shouldn't be needed
     private String passwordConfirm;
 
     @OneToMany(mappedBy = "articlePublishedBy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

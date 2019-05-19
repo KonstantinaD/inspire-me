@@ -40,21 +40,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article updateArticle(Article newArticle, Long articleId) {
-
-        Article articleToUpdate = articleRepository.findById(articleId)
-                .orElseThrow(() -> new NotFoundException(articleId, Article.class));
-
-        articleToUpdate.setArticleTitle(newArticle.getArticleTitle());
-        articleToUpdate.setArticleText(newArticle.getArticleText());
-        articleToUpdate.setImageUrl(newArticle.getImageUrl());
-        articleToUpdate.setCategory(newArticle.getCategory());
-        articleToUpdate.setArticlePublishedBy(newArticle.getArticlePublishedBy());
-
-        return saveArticle(articleToUpdate);
-    }
-
-    @Override
     public List<Article> retrieveAllArticles() {
         return articleRepository.findAll();
     }
@@ -76,6 +61,20 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Article saveArticle(Article article) {
         return articleRepository.save(article);
+    }
+
+    @Override
+    public Article updateArticle(Article newArticle, Long articleId) {
+
+        Article articleToUpdate = retrieveArticle(articleId);
+
+        articleToUpdate.setArticleTitle(newArticle.getArticleTitle());
+        articleToUpdate.setArticleText(newArticle.getArticleText());
+        articleToUpdate.setImageUrl(newArticle.getImageUrl());
+        articleToUpdate.setCategory(newArticle.getCategory());
+        articleToUpdate.setArticlePublishedBy(newArticle.getArticlePublishedBy());
+
+        return saveArticle(articleToUpdate);
     }
 
     @Override

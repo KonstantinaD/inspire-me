@@ -7,12 +7,17 @@ import com.inspireme.service.UserService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
+import org.springframework.hateoas.core.EmbeddedWrapper;
+import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,62 +36,65 @@ public class UserController {
     }
 
     @GetMapping
-    public Resources<Resource<User>> getAllUsers() {
-        if (!userService.retrieveAllUsers().isEmpty()) {
-            List<Resource<User>> users = userService.retrieveAllUsers().stream()
+    public Resources<?> getAllUsers() {
+
+       List<User> users = userService.retrieveAllUsers();
+
+        if (!users.isEmpty()) {
+            List<Resource<User>> userResources = users.stream()
                     .map(userAssembler::toResource)
                     .collect(Collectors.toList());
 
-            return new Resources<>(users,
-                    linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel()); //SelfRef comes from the Get mapping
+            return new Resources<>(userResources,
+                    linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());
         }
-        return null;
+        return new Resources<>(Arrays.asList(getEmptyListUserWrapper()),
+                linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel());
     }
 
     @GetMapping("/{userId}")
     public Resource<User> getUser(@PathVariable Long userId) {
 
-        User user = userService.retrieveUser(userId);
-        return userAssembler.toResource(user);
+        return userAssembler.toResource(userService.retrieveUser(userId));
     }
 
     @PostMapping
-    public ResponseEntity<?> createNewUser(@RequestBody User newUser) throws URISyntaxException {
-        if (newUser.getUserType() == UserType.VISITOR) {
+    public ResponseEntity<?> createNewUser(@RequestBody @Valid User newUser) throws URISyntaxException {
+//        if (newUser.getUserType() == UserType.VISITOR) {
 
-            Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser)); //diff with tutorial
+            Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser));
 
             return ResponseEntity
-                    .created(new URI(userResource.getId().expand().getHref()))  //the italic is the http status
+                    .created(new URI(userResource.getId().expand().getHref()))
                     .body(userResource);
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType()));
+//        }
+//
+//        return ResponseEntity
+//                .status(HttpStatus.FORBIDDEN)
+//                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType()));
     }
 
     @PutMapping("/{userId}")
-    ResponseEntity<?> replaceUser(@RequestBody User newUser,  @PathVariable Long userId) throws URISyntaxException {
-        if (userId != 1) {
-            if (newUser.getUserType() == UserType.VISITOR) {
+    ResponseEntity<?> editUser(@RequestBody @Valid User newUser,  @PathVariable Long userId) throws URISyntaxException {
+        if (userId != 1) {   //PERMISSIONS - secure endpoint better
+//            if (newUser.getUserType() == UserType.VISITOR) {
 
-                User updatedUser = userService.replaceUser(userId, newUser);
+                User updatedUser = userService.updateUser(newUser, userId);
                 Resource<User> userResource = userAssembler.toResource(updatedUser);
 
                 return ResponseEntity
                         .created(new URI(userResource.getId().expand().getHref()))
                         .body(userResource);
-            }
-
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
+//            }
+//
+//            return ResponseEntity
+//                    .status(HttpStatus.FORBIDDEN)
+//                    .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
         }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Updating the Admin User Not Allowed", "You can't update the user with user id " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Editing the Admin User Not Allowed", "You can't edit the user with user id " + userId + ". This is the Admin user."));
 
     }
 
@@ -100,6 +108,10 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
+    }
+
+    private EmbeddedWrapper getEmptyListUserWrapper(){
+        return new EmbeddedWrappers(false).emptyCollectionOf(User.class);
     }
 }
 

@@ -138,8 +138,8 @@ public class ArticleController {
     public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
 
 //        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //PERMISSIONS - secure endpoint better
-        Article articleToUpdate = articleService.updateArticle(newArticle, articleId);
-        Resource<Article> articleResource = articleAssembler.toResource(articleToUpdate);
+        Article updatedArticle = articleService.updateArticle(newArticle, articleId);
+        Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
 
         return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))
