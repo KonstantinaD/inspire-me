@@ -100,7 +100,7 @@ public class CommentController {
 
     //WE NEED TO ENSURE THE COMMENT CAN BE DELETED ONLY BY THE PERSON WHO PUBLISHED IT(THE ADMIN SHOULD BE ABLE TO DELETE ALL COMMENTS) - PERMISSIONS
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<?> removeComment(@PathVariable Long commentId) {
 
            commentService.deleteComment(commentId);
 

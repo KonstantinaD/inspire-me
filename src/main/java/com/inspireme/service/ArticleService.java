@@ -1,6 +1,7 @@
 package com.inspireme.service;
 
 import com.inspireme.model.Article;
+import com.inspireme.model.Tag;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface ArticleService {
     void deleteArticle(Long articleId);
 
     List<Article> retrieveRelatedArticles(Long targetArticleId);
+
+    List<Tag> retrieveAllTagsPerArticle(Long articleId);
 }

@@ -100,7 +100,7 @@ public class UserController {
 
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> removeUser(@PathVariable Long userId) {
         if (userId != 1) {
             userService.deleteUser(userId);
             return ResponseEntity.noContent().build();

@@ -11,6 +11,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.hateoas.core.EmbeddedWrapper;
 import org.springframework.hateoas.core.EmbeddedWrappers;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping(path = "/articles")
+//@RequestMapping(path = "/articles")
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -40,7 +41,7 @@ public class ArticleController {
         this.tagService = tagService;
     }
 
-    @GetMapping
+    @GetMapping("/articles")
     public Resources<?> getAllArticles() {
 
         List<Article> articles = articleService.retrieveAllArticles();
@@ -58,7 +59,7 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
     }
 
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/articles/category/{categoryId}")
     public Resources<?> getArticlesByCategory(@PathVariable Long categoryId) {
 
         List<Article> articles = articleService.retrieveAllArticlesPerCategory(categoryId);
@@ -66,6 +67,7 @@ public class ArticleController {
         if (!articles.isEmpty()) {
             List<Resource<Article>> articleResources = articles.stream()
                     .map(articleAssembler::toResource)
+                    .collect(Collectors.toList());
                     .collect(Collectors.toList());
 
             return new Resources<>(articleResources,
@@ -76,7 +78,7 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getArticlesByCategory(categoryId)).withSelfRel());
     }
 
-    @GetMapping("/tags/{tagId}")
+    @GetMapping("/articles/tags/{tagId}")
     public Resources<?> getArticlesByTag(@PathVariable Long tagId) {
 
         List<Article> articles = articleService.retrieveAllArticlesPerTag(tagId);
@@ -94,7 +96,7 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getArticlesByTag(tagId)).withSelfRel());
     }
 
-    @GetMapping("/relatedArticles/{articleId}")
+    @GetMapping("/articles/relatedArticles/{articleId}")
     public Resources<?> getRelatedArticles(@PathVariable Long articleId) {
 
         List<Article> relatedArticles = articleService.retrieveRelatedArticles(articleId);
@@ -112,12 +114,12 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getRelatedArticles(articleId)).withSelfRel());
     }
 
-    @GetMapping("/{articleId}")
+    @GetMapping("/articles/{articleId}")
     public Resource<Article> getArticle(@PathVariable Long articleId) {
         return articleAssembler.toResource(articleService.retrieveArticle(articleId));
     }
 
-    @PostMapping
+    @PostMapping("/articles")
     public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle) throws URISyntaxException {
 
         if (newArticle.getArticlePublishedBy().getUserId() == 1) {
@@ -125,7 +127,7 @@ public class ArticleController {
             Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
 
             return ResponseEntity
-                    .created(new URI(articleResource.getId().expand().getHref()))  //the italic is the http status
+                    .created(new URI(articleResource.getId().expand().getHref()))
                     .body(articleResource);
         }
 
@@ -134,11 +136,12 @@ public class ArticleController {
                 .body(new VndErrors.VndError("Article Publisher Not Allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
-    @PutMapping("/{articleId}")
+    @PutMapping("/articles/{articleId}")
     public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
 
 //        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //PERMISSIONS - secure endpoint better
         Article updatedArticle = articleService.updateArticle(newArticle, articleId);
+
         Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
 
         return ResponseEntity
@@ -152,16 +155,36 @@ public class ArticleController {
 
 
     //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
-    @DeleteMapping("/{articleId}")
-    public ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
+    @DeleteMapping("/articles/{articleId}")
+    public ResponseEntity<?> removeArticle(@PathVariable Long articleId) {
 
         articleService.deleteArticle(articleId);
 
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("tags/article/{articleId}")
+    public Resources<?> getTagsByArticle(@PathVariable Long articleId) {
 
-    @PostMapping("/{articleId}/tags/{tagId}")
+        List<Tag> tags = articleService.retrieveAllTagsPerArticle(articleId);
+
+        if (!tags.isEmpty()) {
+            List<Resource<Tag>> tagResources = tags.stream()
+                    .map(tag -> new Resource<>(tag,
+                            ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId())).withSelfRel(),
+                            linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withRel("tags/article/{articleId}"),
+                            linkTo(methodOn(TagController.class).getAllTags()).withRel("tags")))
+                    .collect(Collectors.toList());
+
+            return new Resources<>(tagResources,
+                    linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withSelfRel());
+        }
+
+        return new Resources<>(Arrays.asList(TagController.getEmptyListTagWrapper()),
+                linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withSelfRel());
+    }
+
+    @PostMapping("/articles/{articleId}/tags/{tagId}")
     public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @PathVariable/*@RequestBody /*List<*/Long/*>*/ tagId) throws URISyntaxException {
 
         Article article = articleService.retrieveArticle(articleId);
@@ -177,7 +200,7 @@ public class ArticleController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{articleId}/tags/{tagId}")
+    @DeleteMapping("/articles/{articleId}/tags/{tagId}")
     public ResponseEntity deleteTagFromArticle(@PathVariable Long articleId, @PathVariable Long tagId) {
 
         Article article = articleService.retrieveArticle(articleId);

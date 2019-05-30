@@ -12,9 +12,11 @@ public interface TagService {
 
     List<Tag> retrieveAllTags();
 
-    List<Tag> retrieveAllTagsPerArticle(Article article);
+//    List<Tag> retrieveAllTagsPerArticle(Long articleId);
 
-//    Tag saveTag(Tag tag);
-//
-//    void deleteTag (Long TagId);
+    Tag saveTag(Tag tag);
+
+    Tag updateTag(Tag newTag, Long tagId);
+
+    void deleteTag (Long tagId);
 }

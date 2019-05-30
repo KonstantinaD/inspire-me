@@ -3,8 +3,10 @@ package com.inspireme.service.impl;
 import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Article;
 import com.inspireme.model.Category;
+import com.inspireme.model.Tag;
 import com.inspireme.repository.ArticleRepository;
 import com.inspireme.repository.CategoryRepository;
+import com.inspireme.repository.TagRepository;
 import com.inspireme.service.ArticleService;
 import com.inspireme.service.TagService;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
     private final TagService tagService;
 
@@ -26,9 +29,10 @@ public class ArticleServiceImpl implements ArticleService {
     private final static long CATEGORY_WEIGHT = 2;
     private final static long TAG_WEIGHT = 1;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagService tagService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository, TagService tagService) {
         this.articleRepository = articleRepository;
         this.categoryRepository = categoryRepository;
+        this.tagRepository = tagRepository;
         this.tagService = tagService;
     }
 
@@ -97,6 +101,11 @@ public class ArticleServiceImpl implements ArticleService {
                 .sorted(weightComparator.thenComparing(datePublishedComparator))
                 .limit(MAX_RELATED_ARTICLES)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Tag> retrieveAllTagsPerArticle(Long articleId) {
+        return tagRepository.findByArticle(retrieveArticle(articleId));
     }
 
     private long calculateRelevanceWeight(Article targetArticle, Article relatedArticle){
