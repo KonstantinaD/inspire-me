@@ -29,6 +29,7 @@ public class Article {
 
     @ToString.Exclude
     @NotEmpty(message = "Please provide text for the article")
+    @Lob
     private String articleText;
 
     @ToString.Exclude

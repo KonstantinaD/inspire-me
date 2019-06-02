@@ -68,7 +68,6 @@ public class ArticleController {
             List<Resource<Article>> articleResources = articles.stream()
                     .map(articleAssembler::toResource)
                     .collect(Collectors.toList());
-                    .collect(Collectors.toList());
 
             return new Resources<>(articleResources,
                     linkTo(methodOn(ArticleController.class).getArticlesByCategory(categoryId)).withSelfRel());
