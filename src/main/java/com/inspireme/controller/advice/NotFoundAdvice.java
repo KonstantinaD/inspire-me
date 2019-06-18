@@ -45,8 +45,6 @@ public class NotFoundAdvice {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", new Date());
         body.put("errors", errors);
-
         return body;
     }
-
 }

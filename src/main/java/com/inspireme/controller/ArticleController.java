@@ -183,16 +183,14 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withSelfRel());
     }
 
-    @PostMapping("/articles/{articleId}/tags/{tagId}")
-    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @PathVariable/*@RequestBody /*List<*/Long/*>*/ tagId) throws URISyntaxException {
+    @PostMapping("/articles/{articleId}/tags")
+    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @RequestBody List<Long> tagIds) throws URISyntaxException {
 
         Article article = articleService.retrieveArticle(articleId);
 
-//        tagIds.stream()    //add list of tags - DECIDE
-//                .map(tagService::retrieveTag)
-//                .forEach(tag -> article.getTags().add(tag));
-
-        article.getTags().add(tagService.retrieveTag(tagId));
+        tagIds.stream()
+                .map(tagService::retrieveTag)
+                .forEach(tag -> article.getTags().add(tag));
 
         articleService.saveArticle(article);
 

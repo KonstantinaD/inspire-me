@@ -43,7 +43,7 @@ public class Article {
     @ToString.Exclude
     private Set<Comment> comments;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne/*(fetch = FetchType.EAGER, cascade = CascadeType.MERGE /*PERSIST*//*)*/
     @JoinColumn(nullable = false)
     @ToString.Exclude
     @NotNull(message = "Please provide a category")

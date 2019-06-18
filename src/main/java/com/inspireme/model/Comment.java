@@ -26,7 +26,7 @@ public class Comment {
     @ToString.Exclude
     private LocalDateTime dateCommentPublished = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne/*(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)*/
     @JoinColumn(nullable = false)
     @ToString.Exclude
     @NotNull(message = "Please provide an article")

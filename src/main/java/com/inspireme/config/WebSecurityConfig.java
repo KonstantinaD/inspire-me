@@ -31,8 +31,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                //.and().csrf()
+//        it seems to be that you have enabled the CSRF. can you check whether you are passing the CSRF token, in the form. if not please add the following line to your form.
+//                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 .authorizeRequests()
-                    .antMatchers("/resources/**", "/registration", "/tags/**", "/articles/**", "/comments/**", "/users/**").permitAll()
+                    .antMatchers("/resources/**", "/registration", "/tags/**", "/articles/**", "/comments/**", "/users/**", "/categories/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                 .formLogin()

@@ -21,8 +21,8 @@ spring:
 #logging:
 #  level:
 #    org:
-#      springframework: TRACE
-#    com: TRACE
+#      springframework: DEBUG
+#    com: DEBUG
 ---
 spring:
   profiles: h2
