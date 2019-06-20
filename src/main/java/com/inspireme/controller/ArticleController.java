@@ -121,18 +121,18 @@ public class ArticleController {
     @PostMapping("/articles")
     public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle) throws URISyntaxException {
 
-        if (newArticle.getArticlePublishedBy().getUserId() == 1) {
+//        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //disabled due to front end
 
             Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
 
             return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))
                     .body(articleResource);
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Article Publisher Not Allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
+//        }
+//
+//        return ResponseEntity
+//                .status(HttpStatus.FORBIDDEN)
+//                .body(new VndErrors.VndError("Article Publisher Not Allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
     }
 
     @PutMapping("/articles/{articleId}")
