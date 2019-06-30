@@ -16,7 +16,7 @@ public class CategoryResourceAssembler implements ResourceAssembler<Category, Re
     public Resource<Category> toResource(Category category) {
 
         return new Resource<>(category,
-//                ControllerLinkBuilder.linkTo(methodOn(CategoryController.class).getCategory(category.getCategoryId())).withSelfRel(),
+                ControllerLinkBuilder.linkTo(methodOn(CategoryController.class).getCategory(category.getCategoryId())).withSelfRel(),
                 ControllerLinkBuilder.linkTo(methodOn(CategoryController.class).getAllCategories()).withRel("categories"));
     }
 }

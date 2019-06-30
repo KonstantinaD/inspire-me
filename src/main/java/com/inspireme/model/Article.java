@@ -50,7 +50,7 @@ public class Article {
     private Category category;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = true)
     @ToString.Exclude
 //    @NotNull(message = "Please provide an article publisher")
     private User articlePublishedBy;

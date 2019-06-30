@@ -1,5 +1,6 @@
 package com.inspireme.service.impl;
 
+import com.inspireme.exception.NotFoundException;
 import com.inspireme.model.Category;
 import com.inspireme.repository.CategoryRepository;
 import com.inspireme.service.CategoryService;
@@ -14,6 +15,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+    }
+
+    @Override
+    public Category retrieveCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException(categoryId, Category.class));
     }
 
     @Override

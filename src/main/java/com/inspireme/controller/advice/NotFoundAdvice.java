@@ -34,7 +34,7 @@ public class NotFoundAdvice {
     }
 
     private String buildUnresolvedIdMessage(UnresolvedId unresolvedId){
-        return "Couldn't find " + unresolvedId.getType().getSimpleName() + " with id " + unresolvedId.getId();
+        return "Couldn't find [" + unresolvedId.getType().getSimpleName() + "] with id " + unresolvedId.getId();
     }
 
     private Map<String, Object> getBody(String error){

@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface CategoryService {
 
+    Category retrieveCategory(Long categoryId);
+
     List<Category> retrieveAllCategories();
 }

@@ -9,6 +9,7 @@ import org.springframework.hateoas.core.EmbeddedWrapper;
 import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,8 +39,7 @@ public class CategoryController {
 
         if (!categories.isEmpty()) {
             List<Resource<Category>> categoryResources = categoryService.retrieveAllCategories().stream()
-                    .map/*(categoryAssembler::toResource)*/(category -> new Resource<>(category,
-                       ControllerLinkBuilder.linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()))
+                    .map(categoryAssembler::toResource)
                     .collect(Collectors.toList());
 
             return new Resources<>(categoryResources,
@@ -48,6 +48,12 @@ public class CategoryController {
 
         return new Resources<>(Arrays.asList(getEmptyListCategoryWrapper()),
                 linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel());
+    }
+
+    @GetMapping("/{categoryId}")
+    public Resource<Category> getCategory(@PathVariable Long categoryId) {
+
+        return categoryAssembler.toResource(categoryService.retrieveCategory(categoryId));
     }
 
     protected static EmbeddedWrapper getEmptyListCategoryWrapper(){
