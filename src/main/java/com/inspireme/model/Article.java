@@ -55,7 +55,7 @@ public class Article {
 //    @NotNull(message = "Please provide an article publisher")
     private User articlePublishedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE/*PERSIST*/)
     @JoinTable(name = "article_tags",
             joinColumns = @JoinColumn(name = "article_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
