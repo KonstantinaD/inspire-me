@@ -78,6 +78,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleToUpdate.setImageUrl(newArticle.getImageUrl());
         articleToUpdate.setCategory(newArticle.getCategory());
         articleToUpdate.setArticlePublishedBy(newArticle.getArticlePublishedBy());
+        articleToUpdate.setTags(newArticle.getTags());
 
         return saveArticle(articleToUpdate);
     }

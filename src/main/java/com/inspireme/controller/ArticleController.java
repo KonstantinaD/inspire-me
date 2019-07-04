@@ -113,7 +113,7 @@ public class ArticleController {
                 linkTo(methodOn(ArticleController.class).getRelatedArticles(articleId)).withSelfRel());
     }
 
-    @GetMapping("/articles/{articleId}")
+    @GetMapping("/articles/view/{articleId}")
     public Resource<Article> getArticle(@PathVariable Long articleId) {
         return articleAssembler.toResource(articleService.retrieveArticle(articleId));
     }
