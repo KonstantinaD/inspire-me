@@ -29,8 +29,8 @@ public class WebConfig implements WebMvcConfigurer {
      */
     private DefaultFormattingConversionService getHateOsConversionService(){
         try {
-            Class<?> clazz = Class.forName("org.springframework.hateoas.mvc.AnnotatedParametersParameterAccessor$BoundMethodParameter");
-            Field field = clazz.getDeclaredField("CONVERSION_SERVICE");
+            Class<?> klass = Class.forName("org.springframework.hateoas.mvc.AnnotatedParametersParameterAccessor$BoundMethodParameter");
+            Field field = klass.getDeclaredField("CONVERSION_SERVICE");
             field.setAccessible(true);
             return (DefaultFormattingConversionService) field.get(null);
         } catch (Exception ex) {

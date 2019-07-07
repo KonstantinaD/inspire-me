@@ -16,8 +16,8 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "comments")
-@NoArgsConstructor
-@AllArgsConstructor
+//@NoArgsConstructor
+//@AllArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "articleId", scope = Article.class, resolver = EntityIdResolver.class)
 public class Article {
     @Id

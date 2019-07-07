@@ -117,11 +117,11 @@ public class ArticleServiceImpl implements ArticleService {
             relevanceWeight += CATEGORY_WEIGHT;
         }
 
-        long commonTags = targetArticle.getTags().stream()
+        long numberOfCommonTags = targetArticle.getTags().stream()
                 .filter(tag -> relatedArticle.getTags().contains(tag))
                 .count();
 
-        relevanceWeight += (commonTags * TAG_WEIGHT);
+        relevanceWeight += (numberOfCommonTags * TAG_WEIGHT);
 
         return relevanceWeight;
     }
