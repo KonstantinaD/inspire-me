@@ -8,7 +8,6 @@ import org.springframework.context.annotation.DependsOn;
 @Configuration
 public class MigrationConfig {
 
-
     /**
      * Override default flyway initializer to do nothing
      */
@@ -16,7 +15,6 @@ public class MigrationConfig {
     FlywayMigrationInitializer flywayInitializer(Flyway flyway) {
         return new FlywayMigrationInitializer(flyway, (f) ->{} );
     }
-
 
     /**
      * Create a second flyway initializer to run after jpa has created the schema
@@ -26,6 +24,4 @@ public class MigrationConfig {
     FlywayMigrationInitializer delayedFlywayInitializer(Flyway flyway) {
         return new FlywayMigrationInitializer(flyway, null);
     }
-
-
 }

@@ -21,6 +21,7 @@ public class Comment {
 
     @ToString.Exclude
     @NotEmpty(message = "Please provide text for the comment")
+    @Lob
     private String commentText;
 
     @ToString.Exclude

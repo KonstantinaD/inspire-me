@@ -16,8 +16,8 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "comments")
-//@NoArgsConstructor
-//@AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "articleId", scope = Article.class, resolver = EntityIdResolver.class)
 public class Article {
     @Id
@@ -33,6 +33,7 @@ public class Article {
     private String articleText;
 
     @ToString.Exclude
+    @NotEmpty(message = "Please provide an image")
     private String imageUrl;
 
     @ToString.Exclude

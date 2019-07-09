@@ -19,6 +19,7 @@ import java.time.Month;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -102,7 +103,7 @@ public class ArticleServiceImplTest {
 //                .comparing(/*Article::getDateArticlePublished*/article -> article.getClass(), Comparator.reverseOrder());
 
         List<Article> articleList = articleService.retrieveRelatedArticles(ARTICLE_1.getArticleId());
-
+        assertNotNull(ARTICLE_1.getArticleId());
 
         assertThat(articleList).containsExactly(ARTICLE_2, ARTICLE_3, ARTICLE_4, ARTICLE_5)/*.usingComparator(datePublishedComparator)*/;
     }
