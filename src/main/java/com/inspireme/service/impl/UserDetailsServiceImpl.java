@@ -13,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
-//To implement login/authentication with Spring Security, we need to implement org.springframework.security.core.userdetails.UserDetailsService interface
-
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -33,6 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         grantedAuthorities.add(new SimpleGrantedAuthority(user.getUserType().name()));
 
-        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), grantedAuthorities);
+        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
+                grantedAuthorities);
     }
 }

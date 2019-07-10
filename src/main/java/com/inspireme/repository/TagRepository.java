@@ -1,4 +1,5 @@
 package com.inspireme.repository;
+
 import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;

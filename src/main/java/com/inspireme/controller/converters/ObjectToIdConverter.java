@@ -31,7 +31,8 @@ public class ObjectToIdConverter implements Converter<Object, String> {
             Object fieldValue = field.get(obj);
             return Optional.ofNullable(fieldValue)
                     .map(String::valueOf)
-                    .orElseThrow(() -> new RuntimeException("HateOs Conversion Error: Cannot get value from @Id annotated field"));
+                    .orElseThrow(() -> new RuntimeException("HateOs Conversion Error: Cannot get value from @Id " +
+                            "annotated field"));
         } catch (IllegalAccessException e) {
             throw new RuntimeException("HateOs Conversion Error", e);
         }

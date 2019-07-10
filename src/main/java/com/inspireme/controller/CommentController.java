@@ -1,8 +1,6 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.CommentResourceAssembler;
-import com.inspireme.exception.NotFoundException;
-import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 import com.inspireme.service.CommentService;
 import org.springframework.hateoas.Resource;
@@ -85,7 +83,9 @@ public class CommentController {
                 .body(commentResource);
     }
 
-    //PERMISSIONS - ONLY THE PUBLISHER OF THE COMMENT CAN EDIT/DELETE IT, THE BELOW ONLY PREVENTS THE COMMENT PUBLISHER ID FROM CHANGING
+    /**
+     * After the user authentication is finalised only the user who posted the comment will be able to edit it
+     */
     @PutMapping("/{commentId}")
     public ResponseEntity<?> editComment(@RequestBody @Valid Comment newComment, @PathVariable Long commentId) throws URISyntaxException {
 
@@ -98,7 +98,9 @@ public class CommentController {
                     .body(commentResource);
     }
 
-    //WE NEED TO ENSURE THE COMMENT CAN BE DELETED ONLY BY THE PERSON WHO PUBLISHED IT(THE ADMIN SHOULD BE ABLE TO DELETE ALL COMMENTS) - PERMISSIONS
+    /**
+     * After the user authentication is finalised only the user who posted the comment will be able to delete it
+     */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> removeComment(@PathVariable Long commentId) {
 

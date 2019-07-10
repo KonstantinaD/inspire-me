@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "commentId", scope = Comment.class, resolver = EntityIdResolver.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "commentId", scope = Comment.class,
+        resolver = EntityIdResolver.class)
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,7 @@ public class Comment {
     @ToString.Exclude
     private LocalDateTime dateCommentPublished = LocalDateTime.now();
 
-    @ManyToOne/*(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)*/
+    @ManyToOne
     @JoinColumn(nullable = false)
     @ToString.Exclude
     @NotNull(message = "Please provide an article")

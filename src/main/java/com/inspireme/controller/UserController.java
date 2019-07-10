@@ -2,7 +2,6 @@ package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.UserResourceAssembler;
 import com.inspireme.model.User;
-import com.inspireme.model.UserType;
 import com.inspireme.service.UserService;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +25,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RestController
 @RequestMapping(path = "/users")
 public class UserController {
+
     private final UserResourceAssembler userAssembler;
     private final UserService userService;
 
@@ -60,6 +59,11 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createNewUser(@RequestBody @Valid User newUser) throws URISyntaxException {
+        /**
+         * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
+         * Once the authentication is finalised, the users will be created through a front end Registration
+         * process
+         */
 //        if (newUser.getUserType() == UserType.VISITOR) {
 
             Resource<User> userResource = userAssembler.toResource(userService.saveUser(newUser));
@@ -71,12 +75,18 @@ public class UserController {
 //
 //        return ResponseEntity
 //                .status(HttpStatus.FORBIDDEN)
-//                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType()));
+//                .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is "
+// + newUser.getUserType()));
     }
 
     @PutMapping("/{userId}")
     ResponseEntity<?> editUser(@RequestBody @Valid User newUser,  @PathVariable Long userId) throws URISyntaxException {
-        if (userId != 1) {   //PERMISSIONS - secure endpoint better
+        if (userId != 1) {
+            /**
+             * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
+             * Once the authentication is finalised, the user details will be edited through a front end
+             * Login process
+             */
 //            if (newUser.getUserType() == UserType.VISITOR) {
 
                 User updatedUser = userService.updateUser(newUser, userId);
@@ -85,19 +95,20 @@ public class UserController {
                 return ResponseEntity
                         .created(new URI(userResource.getId().expand().getHref()))
                         .body(userResource);
-//            }
+        }
 //
 //            return ResponseEntity
 //                    .status(HttpStatus.FORBIDDEN)
-//                    .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
-        }
+//                    .body(new VndErrors.VndError("User Type Not Allowed", "You can't create a user whose user type
+// is " + newUser.getUserType() + " and you can't set the user type of an existing user to " + newUser.getUserType()));
+//        }
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Editing the Admin User Not Allowed", "You can't edit the user with user id " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Editing the Admin User Not Allowed", "You can't edit " +
+                        "the user with user id " + userId + ". This is the Admin user."));
 
     }
-
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> removeUser(@PathVariable Long userId) {
@@ -107,7 +118,8 @@ public class UserController {
         }
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't delete the user with user id " + userId + ". This is the Admin user."));
+                .body(new VndErrors.VndError("Deleting the Admin User Not Allowed", "You can't " +
+                        "delete the user with user id " + userId + ". This is the Admin user."));
     }
 
     private EmbeddedWrapper getEmptyListUserWrapper(){

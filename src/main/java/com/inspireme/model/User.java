@@ -17,7 +17,8 @@ import java.util.Set;
 @Entity
 @Data
 @EqualsAndHashCode(exclude = "articles")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId", scope = User.class, resolver = EntityIdResolver.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId", scope = User.class,
+        resolver = EntityIdResolver.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +41,12 @@ public class User {
     @NotEmpty(message = "Please provide a password")
     private String password;
 
+    /**
+     * The usage of the 2 password fields will be finalised in the JSON responses when the user authentication through
+     * the React App is finalised
+     */
     @Transient
     @ToString.Exclude
-//    @NotEmpty(message = "Please confirm your password")  this doesn't get encoded in the response body, look again at final implementation - creating users through controller shouldn't be needed
     private String passwordConfirm;
 
     @OneToMany(mappedBy = "articlePublishedBy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

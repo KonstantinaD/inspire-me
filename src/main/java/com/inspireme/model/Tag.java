@@ -17,7 +17,8 @@ import java.util.Set;
 @Data
 @Builder
 @EqualsAndHashCode(exclude = "articles")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tagId", scope = Category.class, resolver = EntityIdResolver.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tagId", scope = Category.class,
+        resolver = EntityIdResolver.class)
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

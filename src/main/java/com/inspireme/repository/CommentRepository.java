@@ -8,7 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment, Long>{
+public interface CommentRepository extends JpaRepository<Comment, Long> {
+
     @Query("SELECT c FROM Comment c WHERE c.article = :article")
     List<Comment> findByArticle(@Param("article") Article article);
 }

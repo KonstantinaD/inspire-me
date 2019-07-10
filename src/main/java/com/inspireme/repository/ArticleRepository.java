@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
+
     @Query("SELECT a FROM Article a WHERE a.category = :category")
     List<Article> findByCategory(@Param("category") Category category);
 

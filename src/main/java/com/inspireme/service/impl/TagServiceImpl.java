@@ -1,25 +1,20 @@
 package com.inspireme.service.impl;
 
 import com.inspireme.exception.NotFoundException;
-import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 import com.inspireme.repository.TagRepository;
-import com.inspireme.service.ArticleService;
 import com.inspireme.service.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
-//    private final ArticleService articleService;
 
-    public TagServiceImpl(TagRepository tagRepository/*, ArticleService articleService*/) {
+    public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-        //this.articleService = articleService;
     }
 
     @Override
@@ -32,11 +27,6 @@ public class TagServiceImpl implements TagService {
     public List<Tag> retrieveAllTags() {
         return tagRepository.findAll();
     }
-
-//    @Override
-//    public List<Tag> retrieveAllTagsPerArticle(Long articleId) {
-//        return tagRepository.findByArticle(articleService.retrieveArticle);
-//    }
 
     @Override
     public Tag saveTag(Tag tag) {

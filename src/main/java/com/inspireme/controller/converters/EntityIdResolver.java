@@ -30,5 +30,4 @@ public class EntityIdResolver implements ObjectIdResolver {
     public boolean canUseFor(final ObjectIdResolver resolverType) {
         return resolverType.getClass() == EntityIdResolver.class;
     }
-
 }

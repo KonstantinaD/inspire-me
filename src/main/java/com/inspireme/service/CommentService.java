@@ -1,10 +1,8 @@
 package com.inspireme.service;
 
-import com.inspireme.model.Article;
 import com.inspireme.model.Comment;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CommentService {
 

@@ -27,7 +27,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-//@RequestMapping(path = "/articles")
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -120,25 +119,29 @@ public class ArticleController {
 
     @PostMapping("/articles")
     public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle) throws URISyntaxException {
-
-//        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //disabled due to front end
-
+        /**
+         * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
+         * Once the authentication is finalised, the articles will be published by a logged-in Admin user
+         */
+//        if (newArticle.getArticlePublishedBy().getUserId() == 1) {
             Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
 
             return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))
                     .body(articleResource);
-//        }
-//
+    }
 //        return ResponseEntity
 //                .status(HttpStatus.FORBIDDEN)
 //                .body(new VndErrors.VndError("Article Publisher Not Allowed", "An article can't be published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can publish articles."));
-    }
+//    }
 
     @PutMapping("/articles/{articleId}")
     public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
-
-//        if (newArticle.getArticlePublishedBy().getUserId() == 1) { //PERMISSIONS - secure endpoint better
+        /**
+         * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
+         * Once the authentication is finalised, the articles will be edited by the logged-in Admin user
+         */
+//        if (newArticle.getArticlePublishedBy().getUserId() == 1) {
         Article updatedArticle = articleService.updateArticle(newArticle, articleId);
 
         Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
@@ -146,14 +149,15 @@ public class ArticleController {
         return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))
                     .body(articleResource);
-        }
+    }
 //        return ResponseEntity
 //                .status(HttpStatus.FORBIDDEN)
-//                .body(new VndErrors.VndError("Article Manipulator Not Allowed", "An article can't be edited or published by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can edit or publish articles."));
+//                .body(new VndErrors.VndError("Article Editor Not Allowed", "An article can't be edited by user with user id " + newArticle.getArticlePublishedBy().getUserId() + ". Only the Admin user with user id 1 can edit articles."));
 //    }
 
-
-    //WE NEED TO PREVENT VISITORS FROM DELETING ARTICLES - MAYBE WITH PERMISSIONS
+    /**
+     * After the user authentication is finalised only the admin will be able to delete articles
+     */
     @DeleteMapping("/articles/{articleId}")
     public ResponseEntity<?> removeArticle(@PathVariable Long articleId) {
 
@@ -170,7 +174,8 @@ public class ArticleController {
         if (!tags.isEmpty()) {
             List<Resource<Tag>> tagResources = tags.stream()
                     .map(tag -> new Resource<>(tag,
-                            ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId())).withSelfRel(),
+                            ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId()))
+                                    .withSelfRel(),
                             linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withRel("tags/article/{articleId}"),
                             linkTo(methodOn(TagController.class).getAllTags()).withRel("tags")))
                     .collect(Collectors.toList());
@@ -184,7 +189,8 @@ public class ArticleController {
     }
 
     @PostMapping("/articles/{articleId}/tags")
-    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @RequestBody List<Long> tagIds) throws URISyntaxException {
+    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @RequestBody List<Long> tagIds)
+            throws URISyntaxException {
 
         Article article = articleService.retrieveArticle(articleId);
 

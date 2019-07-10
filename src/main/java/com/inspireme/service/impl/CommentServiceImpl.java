@@ -9,7 +9,6 @@ import com.inspireme.service.CommentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -47,16 +46,17 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.save(comment);
     }
 
+    /**
+     * After the user authentication is finalised, on the front end the comment will be edited only by the logged-in
+     * user who posted it, and on the article the comment was initially posted on, hence updating the comment
+     * publisher and the respective article is not available through Postman
+     */
     @Override
     public Comment updateComment(Comment newComment, Long commentId) {
 
         Comment commentToUpdate = retrieveComment(commentId);
 
         commentToUpdate.setCommentText(newComment.getCommentText());
-        //ON the UI they won't be able to move the comment to another article - the below is deactivated
-//        commentToUpdate.setArticle(newComment.getArticle());
-        //ONLY THE SAME USER CAN UPDATE THEIR OWN COMMENT - below is deactivated - maybe better with PERMISSIONS
-//        commentToUpdate.setCommentPublishedBy(newComment.getCommentPublishedBy());
 
         return saveComment(commentToUpdate);
     }

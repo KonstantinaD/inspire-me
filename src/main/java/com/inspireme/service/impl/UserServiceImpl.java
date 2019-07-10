@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setUserType(UserType.VISITOR);
-       return userRepository.save(user);
+
+        return userRepository.save(user);
     }
 
     @Override
@@ -48,7 +49,6 @@ public class UserServiceImpl implements UserService {
         userToUpdate.setUserName(newUser.getUserName());
         userToUpdate.setEmailAddress(newUser.getEmailAddress());
         userToUpdate.setPassword(newUser.getPassword());
-//what to do with passwordConfirm - not required on the model because it doesn't come encoded in the POST/PUT response
 
         return saveUser(userToUpdate);
     }

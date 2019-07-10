@@ -17,8 +17,8 @@ public class TagResourceAssembler implements ResourceAssembler<Tag, Resource<Tag
     public Resource<Tag> toResource(Tag tag) {
 
         return new Resource<>(tag,
-                ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId())).withSelfRel(),
-                        /*linkTo(methodOn(TagController.class).getTagsByArticle(tag.getArticles().iterator().next())).withRel("tags/article/{articleId}"),*/
+                ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId()))
+                        .withSelfRel(),
                 linkTo(methodOn(TagController.class).getAllTags()).withRel("tags"));
     }
 }

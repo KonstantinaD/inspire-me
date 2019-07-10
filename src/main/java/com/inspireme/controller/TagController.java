@@ -1,7 +1,6 @@
 package com.inspireme.controller;
 
 import com.inspireme.controller.assemblers.TagResourceAssembler;
-import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
 import com.inspireme.service.TagService;
 import org.springframework.hateoas.Resource;
@@ -69,7 +68,8 @@ public class TagController {
     }
 
     @PutMapping("/{tagId}")
-    public ResponseEntity<?> editTag(@RequestBody @Valid Tag newTag, @PathVariable Long tagId) throws URISyntaxException {
+    public ResponseEntity<?> editTag(@RequestBody @Valid Tag newTag, @PathVariable Long tagId)
+            throws URISyntaxException {
 
         Tag updatedTag = tagService.updateTag(newTag, tagId);
 

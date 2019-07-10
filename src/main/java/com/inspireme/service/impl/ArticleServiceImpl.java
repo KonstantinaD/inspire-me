@@ -68,6 +68,10 @@ public class ArticleServiceImpl implements ArticleService {
         return articleRepository.save(article);
     }
 
+    /**
+     * After the user authentication is finalised, on the front end the article will be edited only by the logged-in
+     * Admin user, hence updating the article publisher is not available through Postman
+     */
     @Override
     public Article updateArticle(Article newArticle, Long articleId) {
 
@@ -77,7 +81,6 @@ public class ArticleServiceImpl implements ArticleService {
         articleToUpdate.setArticleText(newArticle.getArticleText());
         articleToUpdate.setImageUrl(newArticle.getImageUrl());
         articleToUpdate.setCategory(newArticle.getCategory());
-        articleToUpdate.setArticlePublishedBy(newArticle.getArticlePublishedBy());
         articleToUpdate.setTags(newArticle.getTags());
 
         return saveArticle(articleToUpdate);

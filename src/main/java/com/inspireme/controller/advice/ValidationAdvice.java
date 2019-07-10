@@ -33,5 +33,4 @@ public class ValidationAdvice {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(body);
     }
-
 }
