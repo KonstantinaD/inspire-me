@@ -52,7 +52,7 @@ public class Article {
     /**
      * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
      * Once the authentication is finalised, the articles will be published/edited by the logged-in Admin user.
-     * 'Nullable' in @JoinColumn above will be 'false'
+     * 'Nullable' in @JoinColumn below will be 'false'
      */
     @ManyToOne
     @JoinColumn(nullable = true)
