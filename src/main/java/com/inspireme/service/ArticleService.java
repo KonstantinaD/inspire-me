@@ -2,7 +2,9 @@ package com.inspireme.service;
 
 import com.inspireme.model.Article;
 import com.inspireme.model.Tag;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface ArticleService {
@@ -15,9 +17,11 @@ public interface ArticleService {
 
     List<Article> retrieveAllArticlesPerTag(Long tagId);
 
-    Article saveArticle(Article article);
+    List<Article> retrieveAllArticlesPerPublisher(Principal principal);
 
-    Article updateArticle(Article newArticle, Long articleId);
+    Article saveArticle(Article article, OAuth2User principal);
+
+    Article updateArticle(Article newArticle, Long articleId, OAuth2User principal);
 
     void deleteArticle(Long articleId);
 

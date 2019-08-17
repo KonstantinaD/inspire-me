@@ -14,11 +14,14 @@ import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,9 +44,11 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public Resources<?> getAllArticles() {
+//    public Resources<?> getAllArticles() {
 
-        List<Article> articles = articleService.retrieveAllArticles();
+//        List<Article> articles = articleService.retrieveAllArticles();
+    public Resources<?> getAllArticles(Principal principal) {
+        List<Article> articles = articleService.retrieveAllArticlesPerPublisher(principal);
 
         if (!articles.isEmpty()) {
             List<Resource<Article>> articleResources = articles.stream()
@@ -51,11 +56,11 @@ public class ArticleController {
                     .collect(Collectors.toList());
 
             return new Resources<>(articleResources,
-                    linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
+                    linkTo(methodOn(ArticleController.class).getAllArticles(principal)).withSelfRel());
         }
 
         return new Resources<>(Arrays.asList(getEmptyListArticleWrapper()),
-                linkTo(methodOn(ArticleController.class).getAllArticles()).withSelfRel());
+                linkTo(methodOn(ArticleController.class).getAllArticles(principal)).withSelfRel());
     }
 
     @GetMapping("/articles/category/{categoryId}")
@@ -118,13 +123,15 @@ public class ArticleController {
     }
 
     @PostMapping("/articles")
-    public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle) throws URISyntaxException {
+    public ResponseEntity<?> createNewArticle(@RequestBody @Valid Article newArticle,
+                                              @AuthenticationPrincipal OAuth2User principal) throws URISyntaxException {
         /**
          * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
          * Once the authentication is finalised, the articles will be published by a logged-in Admin user
          */
 //        if (newArticle.getArticlePublishedBy().getUserId() == 1) {
-            Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle));
+            Resource<Article> articleResource = articleAssembler.toResource(articleService.saveArticle(newArticle,
+                    principal));
 
             return ResponseEntity
                     .created(new URI(articleResource.getId().expand().getHref()))
@@ -136,13 +143,14 @@ public class ArticleController {
 //    }
 
     @PutMapping("/articles/{articleId}")
-    public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId) throws URISyntaxException {
+    public ResponseEntity<?> editArticle(@RequestBody @Valid Article newArticle, @PathVariable Long articleId,
+                                         @AuthenticationPrincipal OAuth2User principal) throws URISyntaxException {
         /**
          * The below is disabled due to unfinished user authentication on the React app. Enable for Postman testing.
          * Once the authentication is finalised, the articles will be edited by the logged-in Admin user
          */
 //        if (newArticle.getArticlePublishedBy().getUserId() == 1) {
-        Article updatedArticle = articleService.updateArticle(newArticle, articleId);
+        Article updatedArticle = articleService.updateArticle(newArticle, articleId, principal);
 
         Resource<Article> articleResource = articleAssembler.toResource(updatedArticle);
 
@@ -176,7 +184,8 @@ public class ArticleController {
                     .map(tag -> new Resource<>(tag,
                             ControllerLinkBuilder.linkTo(methodOn(TagController.class).getTag(tag.getTagId()))
                                     .withSelfRel(),
-                            linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId)).withRel("tags/article/{articleId}"),
+                            linkTo(methodOn(ArticleController.class).getTagsByArticle(articleId))
+                                    .withRel("tags/article/{articleId}"),
                             linkTo(methodOn(TagController.class).getAllTags()).withRel("tags")))
                     .collect(Collectors.toList());
 
@@ -189,7 +198,8 @@ public class ArticleController {
     }
 
     @PostMapping("/articles/{articleId}/tags")
-    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @RequestBody List<Long> tagIds)
+    public ResponseEntity addTagsToArticle(@PathVariable Long articleId, @RequestBody List<Long> tagIds,
+                                           @AuthenticationPrincipal OAuth2User principal)
             throws URISyntaxException {
 
         Article article = articleService.retrieveArticle(articleId);
@@ -198,13 +208,14 @@ public class ArticleController {
                 .map(tagService::retrieveTag)
                 .forEach(tag -> article.getTags().add(tag));
 
-        articleService.saveArticle(article);
+        articleService.saveArticle(article, principal);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/articles/{articleId}/tags/{tagId}")
-    public ResponseEntity deleteTagFromArticle(@PathVariable Long articleId, @PathVariable Long tagId) {
+    public ResponseEntity deleteTagFromArticle(@PathVariable Long articleId, @PathVariable Long tagId,
+                                               @AuthenticationPrincipal OAuth2User principal) {
 
         Article article = articleService.retrieveArticle(articleId);
 
@@ -214,7 +225,7 @@ public class ArticleController {
             throw new NotFoundException(tagId, Tag.class);
         }
 
-        articleService.saveArticle(article);
+        articleService.saveArticle(article, principal);
 
         return ResponseEntity.noContent().build();
     }

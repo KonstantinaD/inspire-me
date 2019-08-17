@@ -16,5 +16,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("SELECT a FROM Article a WHERE :tag MEMBER OF a.tags")
     List<Article> findByTag(@Param("tag") Tag tag);
+
+    List<Article> findAllByArticlePublishedByUserId(Long userId);
 }
 

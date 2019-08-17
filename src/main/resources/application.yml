@@ -16,6 +16,20 @@ spring:
       suffix: .jsp
   messages:
     basename: validation
+  profiles:
+    active: @spring.profiles.active@
+  security:
+    oauth2:
+      client:
+        registration:
+          okta:
+            client-id: 0oatp1y2t7wfYuh90356
+            client-secret: lnEZRZ2M8JwcCQCfjpgJN-4LRUxS0WAKgVoVG8A8
+            scope: openid, email, profile
+        provider:
+          okta:
+            issuer-uri: https://dev-146932.okta.com/oauth2/default
+
 ---
 spring:
   profiles: h2

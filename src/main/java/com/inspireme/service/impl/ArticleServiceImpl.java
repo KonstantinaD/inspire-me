@@ -1,18 +1,22 @@
 package com.inspireme.service.impl;
 
 import com.inspireme.exception.NotFoundException;
-import com.inspireme.model.Article;
-import com.inspireme.model.Category;
-import com.inspireme.model.Tag;
+import com.inspireme.model.*;
 import com.inspireme.repository.ArticleRepository;
 import com.inspireme.repository.CategoryRepository;
 import com.inspireme.repository.TagRepository;
+import com.inspireme.repository.UserRepository;
 import com.inspireme.service.ArticleService;
 import com.inspireme.service.TagService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final UserRepository userRepository;
 
     private final TagService tagService;
 
@@ -29,11 +34,12 @@ public class ArticleServiceImpl implements ArticleService {
     private final static long CATEGORY_WEIGHT = 2;
     private final static long TAG_WEIGHT = 1;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository, TagService tagService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, CategoryRepository categoryRepository, TagRepository tagRepository, TagService tagService, UserRepository userRepository) {
         this.articleRepository = articleRepository;
         this.categoryRepository = categoryRepository;
         this.tagRepository = tagRepository;
         this.tagService = tagService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -63,7 +69,22 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article saveArticle(Article article) {
+    public List<Article> retrieveAllArticlesPerPublisher(Principal principal) {
+        return articleRepository.findAllByArticlePublishedByUserId(Long.valueOf(principal.getName()));
+    }
+
+    @Override
+    public Article saveArticle(Article article, OAuth2User principal) {
+
+        Map<String, Object> details = principal.getAttributes();
+        Long userId = Long.valueOf(details.get("sub").toString());
+
+        // check to see if user already exists - if it doesn't, create new user
+        Optional<User> user = userRepository.findById(userId);
+        article.setArticlePublishedBy(user.
+                orElse(new User(details.get("userName").toString(), details.get("emailAddress").toString(),
+                        UserType.ADMIN, LocalDateTime.now(), details.get("password").toString(),
+                        details.get("passwordConfirm").toString())));
 
         return articleRepository.save(article);
     }
@@ -73,7 +94,7 @@ public class ArticleServiceImpl implements ArticleService {
      * Admin user, hence updating the article publisher is not available through Postman
      */
     @Override
-    public Article updateArticle(Article newArticle, Long articleId) {
+    public Article updateArticle(Article newArticle, Long articleId, OAuth2User principal) {
 
         Article articleToUpdate = retrieveArticle(articleId);
 
@@ -83,7 +104,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleToUpdate.setCategory(newArticle.getCategory());
         articleToUpdate.setTags(newArticle.getTags());
 
-        return saveArticle(articleToUpdate);
+        return saveArticle(articleToUpdate, principal);
     }
 
     @Override
