@@ -21,7 +21,6 @@
         <yarn.version>v1.12.1</yarn.version>
     </properties>
 
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -65,12 +64,17 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-             <scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupid>com.okta.spring</groupid>
+            <artifactid>okta-spring-boot-starter</artifactid>
+            <version>1.2.1</version>
         </dependency>
 
         <dependency>
